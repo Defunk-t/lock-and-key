@@ -1,0 +1,22 @@
+{
+  "name": "lock-and-key",
+  "version": "0.0.0",
+  "description": "A cyber-security application for credential and key management.",
+  "author": "Aidan Loughran",
+  "repository": "https://github.com/aid-lo/lock-and-key.git",
+  "license": "UNLICENSED",
+  "main": "electron/main.js",
+  "keywords": [
+    "Electron",
+    "cybersecurity",
+    "encryption",
+    "credentials"
+  ],
+  "scripts": {
+    "start": "export NODE_ENV=production&& electron .",
+    "dev": "export NODE_ENV=dev&& electron ."
+  },
+  "devDependencies": {
+    "electron": "^17.0.0"
+  }
+}

@@ -1,0 +1,88 @@
+html {
+    -webkit-user-select: none;
+    -webkit-user-drag: none;
+    cursor: default;
+    box-sizing: border-box;
+    font-size: 16px;
+}
+
+*, *:before, *:after {
+    box-sizing: inherit;
+}
+
+body, h1, h2, h3, h4, h5, h6, p, ol, ul {
+    margin: 0;
+    padding: 0;
+    font-weight: normal;
+}
+
+input, textarea, select, button, img {
+    -webkit-user-drag: none;
+}
+
+ol, ul {
+    list-style: none;
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+}
+
+.draggable {
+    -webkit-app-region: drag;
+}
+
+.selectable {
+    -webkit-user-select: auto;
+    cursor: auto;
+}
+
+body {
+    display: grid;
+    grid-template: min-content auto / min-content auto;
+    gap: 2px;
+    background-color: #000;
+    height: 100vh;
+}
+
+body > * {
+    background-color: #fff;
+}
+
+header {
+    grid-area: 1 / 2 / 1 / -1;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 6px;
+    padding: 0 6px;
+}
+
+header > div {
+    height: 36px;
+    padding: 0 14px;
+    margin: 6px 0;
+    border-radius: 6px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #eee;
+}
+
+header > div:hover {
+    cursor: pointer;
+    background-color: #ddd;
+}
+
+#sidebar {
+    grid-area: 1 / 1 / -1 / 1;
+    min-width: 180px;
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: space-between;
+}
+
+#content {
+    grid-area: 2 / 2 / 2 / 2;
+}
