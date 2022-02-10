@@ -2,15 +2,19 @@
 * text=auto
 
 # Repo settings files
-.git*  text
-.npm*  text
+.git*    text
+.npm*    text
+
+# Documentation
+*.md     text
+LICENSE  text
 
 # Source files
-*.css  text
-*.html text
-*.js   text
-*.json text
+*.css    text
+*.html   text
+*.js     text
+*.json   text
 
 # Lock files
-*.lock            -diff
-package-lock.json -diff
+*.lock             -diff
+package-lock.json  -diff

@@ -1,3 +1,10 @@
+@import "css/login.css";
+
+:root {
+
+}
+
+/* Reset */
 html {
     -webkit-user-select: none;
     -webkit-user-drag: none;
@@ -19,6 +26,9 @@ body, h1, h2, h3, h4, h5, h6, p, ol, ul {
 input, textarea, select, button, img {
     -webkit-user-drag: none;
 }
+input:focus, textarea:focus, select:focus, button:focus {
+    outline: 0;
+}
 
 ol, ul {
     list-style: none;
@@ -29,6 +39,8 @@ img {
     height: auto;
 }
 
+
+/* Classes for allowing website-like functionality */
 .draggable {
     -webkit-app-region: drag;
 }
@@ -38,51 +50,22 @@ img {
     cursor: auto;
 }
 
+
 body {
-    display: grid;
-    grid-template: min-content auto / min-content auto;
-    gap: 2px;
-    background-color: #000;
+    background-color: #fff;
     height: 100vh;
 }
 
-body > * {
-    background-color: #fff;
-}
 
-header {
-    grid-area: 1 / 2 / 1 / -1;
+/* Sits in front of the page */
+.overlay-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
     display: flex;
-    justify-content: flex-end;
     align-items: center;
-    gap: 6px;
-    padding: 0 6px;
-}
-
-header > div {
-    height: 36px;
-    padding: 0 14px;
-    margin: 6px 0;
-    border-radius: 6px;
-    display: flex;
     justify-content: center;
-    align-items: center;
-    background-color: #eee;
-}
-
-header > div:hover {
-    cursor: pointer;
-    background-color: #ddd;
-}
-
-#sidebar {
-    grid-area: 1 / 1 / -1 / 1;
-    min-width: 180px;
-    display: flex;
-    flex-flow: column nowrap;
-    justify-content: space-between;
-}
-
-#content {
-    grid-area: 2 / 2 / 2 / 2;
+    background: #fff7;
 }
