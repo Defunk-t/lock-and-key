@@ -1,67 +1,84 @@
 import Singleton from "../../patterns/singleton";
+import {cE} from "../../patterns/common";
 
 import "./style.css";
 
 /**
  * Login form API.
  */
-export default Singleton(functions => {
+export default Singleton(functions => cE('div', {}, container => {
 
 	/**
-	 * Login form overlay-container.
-	 * @type {HTMLDivElement}
+	 * The password input box.
+	 * @type HTMLInputElement
 	 */
-	const container = document.createElement("div");
-	container.classList.add("overlay-container");
-	container.innerHTML =
-		'<form id="login-form" class="login-form">' +
-			'<label for="login-input">Password</label>' +
-			'<input required autofocus id="login-input" name="password" type="password" placeholder="Master Password">' +
-			'<input id="login-submit" type="submit" value="Unlock">' +
-		'</form>';
+	const input = cE('input', {
+		required: true,
+		autofocus: true,
+		id: "login-input",
+		name: "password",
+		type: "password",
+		placeholder: "Master Password",
+		oninvalid: event => { // TODO
+			//event.preventDefault();
+			console.log("Invalid event caught");
+		}
+	});
 
 	/**
-	 * Login form submit button.
-	 * @type {HTMLInputElement}
+	 * The form submit button.
+	 * @type HTMLInputElement
 	 */
-	const button = container.querySelector("#login-submit");
-	const input = container.querySelector("#login-input");
+	const submit = cE('input', {
+		id: "login-submit",
+		type: "submit",
+		value: "Unlock"
+	});
 
 	/**
-	 * Authenticate the login form.
+	 * Authentication succeeded callback.
 	 */
-	function authenticate() {
-		input.disabled = button.disabled = true;
-		button.value = "...";
-		setTimeout(authFail, 2500);
-	}
+	const authSuccess = () => { // TODO
+		functions.destroy();
+	};
 
 	/**
 	 * Authentication failed callback.
+	 * @return void
 	 */
-	function authFail() {
-		input.disabled = button.disabled = false;
-		button.value = "Unlock";
+	const authFail = () => {
+		input.disabled = submit.disabled = false;
+		submit.value = "Unlock";
 		input.value = "";
 		input.focus();
-	}
-
-	/**
-	 * Authentication success callback.
-	 */
-	function authSuccess() {
-		functions.hide();
-	}
-
-	/**
-	 * Login form onSubmit event handler.
-	 * @param {SubmitEvent} event
-	 */
-	container.querySelector("#login-form").onsubmit = event => {
-		event.preventDefault();
-		authenticate();
 	};
 
-	return container;
+	/**
+	 * Authenticate the login form.
+	 * @param {Event} [event]
+	 * @return void
+	 */
+	const authenticate = event => {
+		if (event) event.preventDefault();
+		input.disabled = submit.disabled = true;
+		submit.value = "...";
+		// TODO: authenticate
+		setTimeout(authFail, 2500);
+	};
 
-});
+	container.classList.add("overlay-container");
+	container.append(cE('form',
+		{
+			id: "login-form",
+			onsubmit: authenticate
+		},
+		form => form.append(
+			cE('label', {
+				for: "login-input",
+				innerText: "Password"
+			}),
+			input,
+			submit
+		)
+	));
+}));
