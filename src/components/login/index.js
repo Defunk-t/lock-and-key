@@ -1,18 +1,19 @@
+import {createElement} from "../../modules/common";
 import Singleton from "../../patterns/singleton";
-import {cE} from "../../patterns/common";
+import Auth from "../../modules/authentication";
 
 import "./style.css";
 
 /**
  * Login form API.
  */
-export default Singleton(functions => cE('div', {}, container => {
+export default Singleton(functions => createElement('div', {}, container => {
 
 	/**
 	 * The password input box.
 	 * @type HTMLInputElement
 	 */
-	const input = cE('input', {
+	const input = createElement('input', {
 		required: true,
 		autofocus: true,
 		id: "login-input",
@@ -29,7 +30,7 @@ export default Singleton(functions => cE('div', {}, container => {
 	 * The form submit button.
 	 * @type HTMLInputElement
 	 */
-	const submit = cE('input', {
+	const submit = createElement('input', {
 		id: "login-submit",
 		type: "submit",
 		value: "Unlock"
@@ -62,18 +63,17 @@ export default Singleton(functions => cE('div', {}, container => {
 		if (event) event.preventDefault();
 		input.disabled = submit.disabled = true;
 		submit.value = "...";
-		// TODO: authenticate
-		setTimeout(authFail, 2500);
+		setTimeout(Auth.unlock(input.value) ? authSuccess : authFail, 2000);
 	};
 
 	container.classList.add("overlay-container");
-	container.append(cE('form',
+	container.append(createElement('form',
 		{
 			id: "login-form",
 			onsubmit: authenticate
 		},
 		form => form.append(
-			cE('label', {
+			createElement('label', {
 				for: "login-input",
 				innerText: "Password"
 			}),

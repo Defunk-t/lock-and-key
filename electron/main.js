@@ -14,7 +14,7 @@ function createWindow () {
 		}
 	});
 
-	w.loadFile("src/index.html").then(() => {
+	w.loadFile("dist/login.html").then(() => {
 		if (process.env.NODE_ENV !== "production") {
 			w.webContents.openDevTools();
 			console.log("App initialised.");
