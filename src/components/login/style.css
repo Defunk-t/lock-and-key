@@ -16,6 +16,7 @@
 }
 #login-form input {
     border: 1px solid transparent;
+    border-right: none;
     font-size: 14pt;
     text-align: center;
 }
@@ -24,15 +25,16 @@
     background: #fff;
     border-color: gray !important;
 }
+#login-input:focus {
+    border-color: dodgerblue !important;
+}
 #login-submit {
-    content: "Login";
     padding: 10px 0;
     width: 80px;
     background: dodgerblue;
     cursor: pointer;
 }
-#login-submit.loading {
-    content: "...";
+#login-submit:disabled {
     background: gray;
     cursor: default;
 }

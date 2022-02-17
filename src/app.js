@@ -1,3 +1,5 @@
-import loginForm from "./js/login.js";
+import LoginForm from "./components/login";
 
-loginForm.show();
+import "./styles.css";
+
+LoginForm.show();

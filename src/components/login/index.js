@@ -1,4 +1,6 @@
-import Singleton from "./patterns/singleton.js";
+import Singleton from "../../patterns/singleton";
+
+import "./style.css";
 
 /**
  * Login form API.
@@ -15,7 +17,7 @@ export default Singleton(functions => {
 		'<form id="login-form" class="login-form">' +
 			'<label for="login-input">Password</label>' +
 			'<input required autofocus id="login-input" name="password" type="password" placeholder="Master Password">' +
-			'<input id="login-submit" class="default" type="submit" value="Unlock">' +
+			'<input id="login-submit" type="submit" value="Unlock">' +
 		'</form>';
 
 	/**
@@ -30,7 +32,6 @@ export default Singleton(functions => {
 	 */
 	function authenticate() {
 		input.disabled = button.disabled = true;
-		button.classList.replace("default", "loading");
 		button.value = "...";
 		setTimeout(authFail, 2500);
 	}
@@ -40,9 +41,9 @@ export default Singleton(functions => {
 	 */
 	function authFail() {
 		input.disabled = button.disabled = false;
-		button.classList.replace("loading", "default");
 		button.value = "Unlock";
 		input.value = "";
+		input.focus();
 	}
 
 	/**
