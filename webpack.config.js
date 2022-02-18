@@ -3,7 +3,7 @@ const FS = require('fs');
 const JsMinimizer = require('terser-webpack-plugin');
 const CssExtractor = require("mini-css-extract-plugin");
 const CssMinimizer = require('css-minimizer-webpack-plugin');
-const HtmlPlugin = require('html-webpack-plugin');
+//const HtmlPlugin = require('html-webpack-plugin');
 
 /**
  * Entry points for webpack.
@@ -30,11 +30,14 @@ module.exports = {
 		path: Path.join(__dirname, "dist")
 	},
 	plugins: [
-		new CssExtractor(),
-		new HtmlPlugin({
-			title: 'Lock & Key',
-			filename: '[name].html'
-		})
+		new CssExtractor()//,
+		// new HtmlPlugin({			// commented out because it creates per-webpack html, but injects all webpacks into each one.
+		// 	title: 'Lock & Key',	// annoying so I decided to just do html manually for now.
+		// 	filename: '[name].html',
+		// 	meta: {
+		// 		viewport: 'width=device-width, initial-scale=1, shrink-to-fit=no'
+		// 	}
+		// })
 	],
 	module: {
 		rules: [
