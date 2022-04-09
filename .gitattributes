@@ -1,20 +1,8 @@
-# Normalize line endings
+# Normalise line endings
 * text=auto
 
-# Repo settings files
-.git*    text
-.npm*    text
-
-# Documentation
-*.md     text
-LICENSE  text
-
-# Source files
-*.css    text
-*.html   text
-*.js     text
-*.json   text
-
-# Lock files
-*.lock             -diff
+# Don't show in Git diff
 package-lock.json  -diff
+
+# Show in GitHub language stats
+/electron/window/*/config.json  linguist-detectable=true
