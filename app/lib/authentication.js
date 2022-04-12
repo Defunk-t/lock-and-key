@@ -8,5 +8,5 @@ let key;
 export const unlock = password => false;
 
 export default {
-	unlock: unlock
+	unlock
 };

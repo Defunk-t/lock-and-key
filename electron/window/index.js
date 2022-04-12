@@ -20,7 +20,7 @@ module.exports = windowName => {
 	})();
 
 	return (window =>
-		window.loadFile(`app/html/${windowName}.html`).then(() => window)
+		window.loadFile(`app/${windowName}/index.html`).then(() => window)
 	)(new BrowserWindow(Object.assign(config, {
 		webPreferences: Object.assign(config.webPreferences ?? {}, {
 			preload: join(__dirname, windowName, 'preload.js')

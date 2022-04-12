@@ -1,8 +1,5 @@
-import {createElement} from "../../modules/common";
-import Singleton from "../../patterns/singleton";
-import Auth from "../../modules/authentication";
-
-import "./style.css";
+import {createElement, Singleton} from "../lib/ui/index.js";
+import Auth from "../lib/authentication.js";
 
 /**
  * Login form API.
