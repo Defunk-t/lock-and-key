@@ -3,7 +3,7 @@ const {BrowserWindow} = require('electron');
 
 /**
  * Opens a browser window. Returns a Promise that fulfills with the BrowserWindow object.
- * @param {'app'|'login'|'setup'} windowName
+ * @param {'app'|'setup'|'unlock'} windowName
  * @return Promise<Electron.CrossProcessExports.BrowserWindow>
  */
 module.exports = windowName => {
@@ -15,8 +15,8 @@ module.exports = windowName => {
 	const config = (() => {
 		switch (windowName) {
 			case 'app':
-			case 'login':
 			case 'setup':
+			case 'unlock':
 				// Import the config.json for the desired window
 				return require(`./${windowName}/config.json`);
 			default:
@@ -40,5 +40,5 @@ module.exports = windowName => {
 
 	// Load the corresponding HTML for the window from the client folder
 	// Returned promise fulfils with the BrowserWindow object
-	return window.loadFile(`client/${windowName}/index.html`).then(() => window);
+	return window.loadFile(`client/${windowName}.html`).then(() => window);
 };
