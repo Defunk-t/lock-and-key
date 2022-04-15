@@ -13,14 +13,13 @@ export default Singleton(functions => createElement('div', {}, container => {
 	const input = createElement('input', {
 		required: true,
 		autofocus: true,
-		id: "login-input",
-		name: "password",
-		type: "password",
-		placeholder: "Master Password",
-		oninvalid: event => { // TODO
-			//event.preventDefault();
-			console.log("Invalid event caught");
-		}
+		id: 'login-input',
+		name: 'password',
+		type: 'password',
+		placeholder: "Master Password"
+		//oninvalid: event => { // TODO
+		//	event.preventDefault();
+		//}
 	});
 
 	/**
@@ -28,8 +27,8 @@ export default Singleton(functions => createElement('div', {}, container => {
 	 * @type HTMLInputElement
 	 */
 	const submit = createElement('input', {
-		id: "login-submit",
-		type: "submit",
+		id: 'login-submit',
+		type: 'submit',
 		value: "Unlock"
 	});
 
@@ -63,19 +62,37 @@ export default Singleton(functions => createElement('div', {}, container => {
 		setTimeout(Auth.unlock(input.value) ? authSuccess : authFail, 2000);
 	};
 
-	container.classList.add("overlay-container");
-	container.append(createElement('form',
-		{
-			id: "login-form",
-			onsubmit: authenticate
-		},
-		form => form.append(
-			createElement('label', {
-				for: "login-input",
-				innerText: "Password"
-			}),
-			input,
-			submit
+	// Set up the Singleton
+	container.classList.add('overlay-container');
+	container.append(
+
+		// Introductory text
+		createElement('h1', {
+			innerText: "Welcome"
+		}),
+		createElement('p', {
+			innerText: "Enter your master password to unlock the app."
+		}),
+
+		// Form
+		createElement('form',
+			{
+				id: 'login-form',
+				onsubmit: authenticate
+			},
+			// Append elements to the form
+			form => form.append(
+
+				// Password label + input
+				createElement('label', {
+					for: 'login-input',
+					innerText: "Password"
+				}),
+				input,
+
+				// Submit button
+				submit
+			)
 		)
-	));
+	);
 }));
