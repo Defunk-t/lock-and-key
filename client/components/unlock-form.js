@@ -1,5 +1,5 @@
 import {createElement, Singleton} from "../lib/ui/index.js";
-import Auth from "../lib/authentication.js";
+import Auth from "../lib/auth.js";
 
 /**
  * Login form API.

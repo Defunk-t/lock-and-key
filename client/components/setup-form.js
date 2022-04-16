@@ -1,4 +1,5 @@
 import {createElement, Singleton} from "../lib/ui/index.js";
+import {testPassword, onboard} from "../lib/auth.js";
 
 export default Singleton(functions => createElement('div', {}, container => {
 
@@ -41,6 +42,25 @@ export default Singleton(functions => createElement('div', {}, container => {
 		type: 'submit'
 	});
 
+	/**
+	 * The form error message.
+	 * @type HTMLParagraphElement
+	 */
+	const error = createElement('p', {}, element =>
+		element.classList.add('error'));
+
+	/**
+	 *
+	 * @param {string} message
+	 */
+	const setError = message => {
+		error.innerText = message;
+		pwConfirmInput.value = "";
+		pwInput.disabled = pwConfirmInput.disabled = submit.disabled = false;
+		submit.value = "Submit";
+		pwInput.focus();
+	};
+
 	// Set up the Singleton
 	container.classList.add('overlay-container');
 	container.append(
@@ -58,27 +78,52 @@ export default Singleton(functions => createElement('div', {}, container => {
 
 		// Form
 		createElement('form', {
-			id: 'setup-form'
-			//onsubmit:
+			id: 'setup-form',
+
+			/**
+			 * Handle form submit event.
+			 * @param {SubmitEvent} event
+			 */
+			onsubmit: event => {
+
+				// Prevent synchronous submit
+				event.preventDefault();
+
+				// Temporarily disable form
+				pwInput.disabled = pwConfirmInput.disabled = submit.disabled = true;
+				submit.value = "...";
+
+				// Check if passwords match
+				// Test password strength
+				// Start onboard process
+				setError(pwInput.value !== pwConfirmInput.value ? "Passwords do not match." : (testPassword(pwInput.value) ?? onboard(pwInput.value) ?? ""));
+			}
 		},
 		form => form.append(
 
-			// Password label + input
+			// Password label
 			createElement('label', {
 				for: 'submit-pw-input',
 				innerText: "Choose a master password"
 			}),
+
+			// Password input
 			pwInput,
 
-			// Confirm password label + input
+			// Confirm password label
 			createElement('label', {
 				for: 'submit-confirm-input',
 				innerText: "Confirm password"
 			}),
+
+			// Confirm password input
 			pwConfirmInput,
 
 			// Submit button
-			submit
+			submit,
+
+			// Error message
+			error
 		))
 	);
 }));
