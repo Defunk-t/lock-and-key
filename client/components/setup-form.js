@@ -1,5 +1,14 @@
 import {createElement, Singleton} from "../lib/ui/index.js";
-import {testPassword, onboard} from "../lib/auth.js";
+
+/**
+ * Decides whether a password is strong enough.
+ * Returns an error message `string` if the password is not strong enough,
+ * otherwise returns `false`.
+ * @param {string} password
+ * @return string|null
+ */
+const testPassword = password =>
+	password.length < 8 ? "Password should be a minimum of 8 characters." : null;
 
 export default Singleton(functions => createElement('div', {}, container => {
 
@@ -46,7 +55,7 @@ export default Singleton(functions => createElement('div', {}, container => {
 	 * The form error message.
 	 * @type HTMLParagraphElement
 	 */
-	const error = createElement('p', {}, element =>
+	const errorMsg = createElement('p', {}, element =>
 		element.classList.add('error'));
 
 	/**
@@ -54,7 +63,7 @@ export default Singleton(functions => createElement('div', {}, container => {
 	 * @param {string} message
 	 */
 	const setError = message => {
-		error.innerText = message;
+		errorMsg.innerText = message;
 		pwConfirmInput.value = "";
 		pwInput.disabled = pwConfirmInput.disabled = submit.disabled = false;
 		submit.value = "Submit";
@@ -94,9 +103,15 @@ export default Singleton(functions => createElement('div', {}, container => {
 				submit.value = "...";
 
 				// Check if passwords match
+				if (pwInput.value !== pwConfirmInput.value) return setError("Passwords do not match.");
+
 				// Test password strength
+				const error = testPassword(pwInput.value);
+				if (error) return setError(error);
+
 				// Start onboard process
-				setError(pwInput.value !== pwConfirmInput.value ? "Passwords do not match." : (testPassword(pwInput.value) ?? onboard(pwInput.value) ?? ""));
+				window.API.onboard(pwInput.value)
+					.then(() => errorMsg.innerText = "Success!", setError);
 			}
 		},
 		form => form.append(
@@ -123,7 +138,7 @@ export default Singleton(functions => createElement('div', {}, container => {
 			submit,
 
 			// Error message
-			error
+			errorMsg
 		))
 	);
 }));

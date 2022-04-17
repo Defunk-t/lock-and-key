@@ -1,3 +1,5 @@
-const {contextBridge} = require('electron');
+const {contextBridge, ipcRenderer} = require('electron');
 
-contextBridge.exposeInMainWorld('test', () => console.log("Test"));
+contextBridge.exposeInMainWorld('API', {
+	onboard: password => ipcRenderer.invoke('onboard', password)
+});

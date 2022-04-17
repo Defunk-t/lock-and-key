@@ -1,12 +1,14 @@
-const {app, BrowserWindow} = require('electron');
-const {isDataInitialised} = require('./userData.js');
+const {app, BrowserWindow, ipcMain} = require('electron');
+const {isDataInitialised, setHash} = require('./data');
 const createWindow = require('./window');
+
+if (!isDataInitialised) ipcMain.handleOnce('onboard', (event, password) => setHash(password));
 
 /**
  * Opens the 'login' or 'setup' window, depending on whether the user's data has yet been initialised.
  * @return Promise<Electron.CrossProcessExports.BrowserWindow>
  */
-const initialiseWindow = () => createWindow(isDataInitialised() ? 'unlock' : 'setup')/*.then(window => window.webContents.openDevTools())*/;
+const initialiseWindow = () => createWindow(isDataInitialised ? 'unlock' : 'setup')/*.then(window => window.webContents.openDevTools())*/;
 
 // Called when Electron has finished initialising
 app.whenReady().then(() => {
