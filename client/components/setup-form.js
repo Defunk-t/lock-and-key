@@ -1,14 +1,5 @@
 import {createElement, Singleton} from "../lib/ui/index.js";
-
-/**
- * Decides whether a password is strong enough.
- * Returns an error message `string` if the password is not strong enough,
- * otherwise returns `false`.
- * @param {string} password
- * @return string|null
- */
-const testPassword = password =>
-	password.length < 8 ? "Password should be a minimum of 8 characters." : null;
+import testPassword from "../lib/test-password.js";
 
 export default Singleton(functions => createElement('div', {}, container => {
 
