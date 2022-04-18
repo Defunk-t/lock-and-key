@@ -1,5 +1,4 @@
 import {createElement, Singleton} from "../lib/ui/index.js";
-import Auth from "../lib/auth.js";
 
 /**
  * Login form API.
@@ -59,7 +58,9 @@ export default Singleton(functions => createElement('div', {}, container => {
 		if (event) event.preventDefault();
 		input.disabled = submit.disabled = true;
 		submit.value = "...";
-		setTimeout(Auth.unlock(input.value) ? authSuccess : authFail, 2000);
+		// window.API.unlock(input.value)
+		// 	.then(authSuccess, authFail);
+		authFail();
 	};
 
 	// Set up the Singleton

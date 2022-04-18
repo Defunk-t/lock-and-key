@@ -1,24 +1,32 @@
 const {app, BrowserWindow, ipcMain} = require('electron');
-const {isDataInitialised, setHash} = require('./data');
+const {isDataInitialised, onboard, unlock} = require('./data');
 const createWindow = require('./window');
 
-if (!isDataInitialised) ipcMain.handleOnce('onboard', (event, password) => setHash(password));
-
 /**
- * Opens the 'login' or 'setup' window, depending on whether the user's data has yet been initialised.
+ * Opens the 'unlock' or 'setup' window, depending on whether the user's data has yet been initialised.
  * @return Promise<Electron.CrossProcessExports.BrowserWindow>
  */
-const initialiseWindow = () => createWindow(isDataInitialised ? 'unlock' : 'setup')/*.then(window => window.webContents.openDevTools())*/;
+function initWindow() {
+
+	const WINDOW  = isDataInitialised ? 'unlock' : 'setup'  ;
+	const EVENT   = isDataInitialised ?  WINDOW  : 'onboard';
+	const HANDLER = isDataInitialised ?  unlock  :  onboard ;
+
+	ipcMain.handle(EVENT, (event, password) => HANDLER(password));
+
+	createWindow(WINDOW).then(window =>
+		window.on('close', () => ipcMain.removeHandler(WINDOW)));
+}
 
 // Called when Electron has finished initialising
 app.whenReady().then(() => {
 
 	// Open initial window
-	initialiseWindow();
+	initWindow();
 
 	// Set Electron to re-open initial window when app activates with no windows open (i.e. activated from the system tray)
 	app.on('activate', () => {
-		if (BrowserWindow.getAllWindows().length === 0) initialiseWindow();
+		if (BrowserWindow.getAllWindows().length === 0) initWindow();
 	});
 });
 
