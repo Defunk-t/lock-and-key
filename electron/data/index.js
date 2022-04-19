@@ -1,80 +1,60 @@
-// Node.js
-const {accessSync, mkdirSync} = require('fs');
-const {R_OK} = require('fs').constants;
+const {accessSync, mkdirSync, constants: fsConstants} = require('fs');
 const {writeFile} = require('fs/promises');
 const {join} = require('path');
-const {cpus, totalmem} = require('os');
 
-// 3rd party
-const {argon2id, hash} = require('argon2');
 const {generateKey} = require('openpgp');
 
-/**
- * The directory where user's data for this app is stored.
- * @type string
- */
-const userDataDirectory = join(require('electron').app.getPath('home'), '.lock-and-key');
+const DATA_DIR = require('./data-directory.js');
+const Password = require('./password.js')
 
 // Create the directory if needed
-mkdirSync(userDataDirectory, {recursive: true, mode: 0o700});
+mkdirSync(DATA_DIR, {recursive: true, mode: 0o700});
 
-/**
- * Path to the file containing the hashed password.
- * @type string
- */
-const PATH_HASH = join(userDataDirectory, 'hash');
 
 /**
  * Path to the file containing the user's public key.
  * @type string
  */
-const PATH_KEY_PUBLIC = join(userDataDirectory, 'id_ecdsa.pub');
+const PATH_KEY_PUBLIC = join(DATA_DIR, 'id_ecdsa.pub');
 
 /**
  * Path to the file containing the user's encrypted private key.
  * @type string
  */
-const PATH_KEY_PRIVATE = join(userDataDirectory, 'id_ecdsa');
+const PATH_KEY_PRIVATE = join(DATA_DIR, 'id_ecdsa');
 
 /**
  * Returns the path to the encrypted secrets file for a given account ID.
  * @param {*} id
  * @return string
  */
-const getAccountFilePath = id => join(userDataDirectory, 'account', id);
+const getAccountFilePath = id => join(DATA_DIR, 'account', id);
 
 /**
- * True if user has completed setup process, or false if not.
- * @return boolean
+ * @type boolean
  */
-module.exports.isDataInitialised = (() => {
-	try {
-		accessSync(PATH_HASH,        R_OK);
-		accessSync(PATH_KEY_PUBLIC,  R_OK);
-		accessSync(PATH_KEY_PRIVATE, R_OK);
-		return true;
-	} catch (e) {
-		return false;
-	}
-})();
+let dataInitialised;
 
-function createHash(password) {
-
-	console.log("Doing a password hash.");
-
-	const parallelism = cpus().length;
-	const timestamp = Date.now();
-
-	return hash(password, {
-		type: argon2id,
-		parallelism,
-		memoryCost: Math.floor(totalmem() / 32000 / parallelism), // 1/32 system memory divided between threads
-		timeCost: Math.floor((2 + Math.log(parallelism)) * parallelism * 1.5)
-	}).then(value => {
-		console.log(`Hash took ${Date.now() - timestamp} ms.\nWriting to ${PATH_HASH}`);
-		return writeFile(PATH_HASH, value, {mode: 0o400});
-	}).then(() => console.log("Hash file written."));
-}
+/**
+ * Resolves true if user has completed setup process, or false if not.
+ * @return Promise<boolean>
+ */
+module.exports.isDataInitialised = () => new Promise(resolve => {
+	if (!dataInitialised === undefined) resolve(dataInitialised);
+	else Password.isSet()
+		.then(isPasswordSet => {
+			if (!isPasswordSet) resolve(dataInitialised = false);
+			else {
+				try {
+					accessSync(PATH_KEY_PUBLIC, fsConstants.R_OK);
+					accessSync(PATH_KEY_PRIVATE, fsConstants.R_OK);
+				} catch (e) {
+					resolve(dataInitialised = false);
+				}
+				resolve(dataInitialised = true);
+			}
+		});
+});
 
 function createKeys(passphrase, callback) {
 
@@ -95,9 +75,8 @@ function createKeys(passphrase, callback) {
 		let i = 0;
 
 		const write = (file, value) => {
-			console.log(`Writing to ${file}.`);
+			console.log(`Writing to ${file}`);
 			writeFile(file, value, {mode: 0o400}).then(() => {
-				console.log(`${file} written.`);
 				if (callback && ++i === 2) callback();
 			});
 		};
@@ -110,15 +89,23 @@ function createKeys(passphrase, callback) {
 }
 
 /**
+ * Set the master password and generate keys.
  * @param {string} password
  * @return Promise<void>
  */
 module.exports.onboard = password =>
-	createKeys(password) && createHash(password);
+	new Promise(resolve => {
+		let i = 0;
+		function inc() {
+			if (++i === 2) resolve();
+		}
+		Password.set(password).then(inc);
+		createKeys(password).then(inc);
+	});
 
 /**
- * TODO
+ * Test the given password string against the hash.
  * @param {string} password
- * @return false
+ * @return Promise<boolean>
  */
-module.exports.unlock = password => false;
+module.exports.unlock = Password.test;

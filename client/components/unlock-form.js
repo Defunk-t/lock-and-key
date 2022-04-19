@@ -58,9 +58,8 @@ export default Singleton(functions => createElement('div', {}, container => {
 		if (event) event.preventDefault();
 		input.disabled = submit.disabled = true;
 		submit.value = "...";
-		// window.API.unlock(input.value)
-		// 	.then(authSuccess, authFail);
-		authFail();
+		window.API.unlock(input.value)
+			.then(valid => valid ? authSuccess() : authFail(), authFail);
 	};
 
 	// Set up the Singleton
