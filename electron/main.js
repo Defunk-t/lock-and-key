@@ -1,24 +1,43 @@
 const {app, BrowserWindow, ipcMain} = require('electron');
-const {isDataInitialised, onboard, testPassword} = require('./data');
 const createWindow = require('./window');
+const Data = require('./data');
 
 /**
- * Opens the 'unlock' or 'setup' window, depending on whether the user's data has yet been initialised.
+ * Opens the 'onboard' or 'setup' window, depending on whether the user's data has yet been initialised.
  * @return Promise<Electron.CrossProcessExports.BrowserWindow>
  */
-const initWindow = () => new Promise(resolve => isDataInitialised().then(DATA_INIT => {
+const initWindow = () => new Promise(resolve => {
 
-	const WINDOW  = DATA_INIT ?   'unlock'   :  'setup' ;
-	const EVENT   = DATA_INIT ?    WINDOW    : 'onboard';
-	const HANDLER = DATA_INIT ? testPassword :  onboard ;
+	/**
+	 * @type 'unlock'|'onboard'
+	 */
+	let windowType;
 
-	ipcMain.handle(EVENT, (event, password) => HANDLER(password));
+	Data.isInitialised()
+		.then(isInit => windowType = isInit ? 'unlock' : 'onboard')
+		.then(createWindow)
+		.then(window => {
+			resolve(window);
 
-	createWindow(WINDOW).then(window => {
-		resolve(window);
-		window.on('close', () => ipcMain.removeHandler(WINDOW));
-	});
-}));
+			// this handler stuff should probably be put into createWindow function
+
+			window.on('closed', () => ipcMain.removeHandler(windowType));
+			ipcMain.handle(windowType, windowType === 'unlock' ? (event, password) =>
+				Data.testPassword(password)
+					.then(pwValid => {
+						if (pwValid) createWindow('app')
+							.then(() => window.destroy());
+						return pwValid;
+					})
+			: (event, password) =>
+				Data.onboard(password)
+					.then(() => createWindow('app'))
+					.then(() => window.destroy())
+			);
+
+			return window;
+		});
+});
 
 // Called when Electron has finished initialising
 app.whenReady().then(() => {

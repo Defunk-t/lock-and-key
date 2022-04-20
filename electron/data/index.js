@@ -10,7 +10,7 @@ let dataInitialised;
  * Resolves true if user has completed setup process, or false if not.
  * @return Promise<boolean>
  */
-module.exports.isDataInitialised = () =>
+module.exports.isInitialised = () =>
 	new Promise(resolve => {
 		if (!dataInitialised === undefined) resolve(dataInitialised);
 		else Password.isSet().then(isSet => {
