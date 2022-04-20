@@ -1,16 +1,11 @@
 const {join} = require('path');
-const {readFile, writeFile, rm} = require('fs/promises');
 const {cpus, totalmem} = require('os');
 
 const {argon2id, hash, verify} = require('argon2');
 
-const DATA_DIR = require('./data-directory.js')
-
-/**
- * Location of the password hash file.
- * @type string
- */
-const HASH_PATH = join(DATA_DIR, 'hash');
+const DATA_DIR = require('./data-directory.js');
+const File = require('./file.js');
+const hashFile = File(join(DATA_DIR, 'hash'));
 
 /**
  * Argon2 options.
@@ -26,30 +21,6 @@ const HASH_OPTIONS = (() => {
 })();
 
 /**
- * The current password hash.
- * @type ?string
- */
-let currentHash;
-
-/**
- * Read the hash file.
- * Returns a string with the contents or NULL if it does not exist.
- * @return Promise<?string>
- */
-const readHash = () =>
-	readFile(HASH_PATH, 'utf8')
-		.then(data => data, () => null);
-
-/**
- * Get the current hash value.
- * Hash is read from file, and then stored in memory for subsequent calls.
- * Returns a string with the contents or NULL if it does not exist.
- * @return Promise<?string>
- */
-const getHash = () =>
-	!!currentHash ? new Promise(resolve => resolve(currentHash)) : readHash().then(data => currentHash = data);
-
-/**
  * Generate an Argon2 hash for the given password.
  * @param {string} password
  * @return Promise<string>
@@ -58,30 +29,18 @@ function generateHash(password) {
 	console.log("Doing a password hash.");
 	const timestamp = Date.now();
 	return hash(password, HASH_OPTIONS)
-		.then(hash => {
+		.then(value => {
 			console.log(`Hash took ${Date.now() - timestamp} ms.`);
-			currentHash = hash;
-			return hash;
+			return value;
 		});
-}
-
-/**
- * Write/overwrite the hash file with the given string.
- * @param {string} hash
- * @return Promise<void>
- */
-function writeHash(hash) {
-	console.log(`Writing to ${HASH_PATH}`);
-	const write = () => writeFile(HASH_PATH, hash, {mode: 0o400});
-	return rm(HASH_PATH).then(write, write);
 }
 
 /**
  * Check if the master password exists/is set.
  * @return Promise<boolean>
  */
-module.exports.isSet = () =>
-	getHash().then(hash => !!hash);
+module.exports.isSet = hashFile.isSet;
+
 
 /**
  * Set or update the master password.
@@ -89,8 +48,7 @@ module.exports.isSet = () =>
  * @return Promise<void>
  */
 module.exports.set = password =>
-	generateHash(password)
-		.then(writeHash);
+	generateHash(password).then(hashFile.set);
 
 /**
  * Test the given password string against the hash.
@@ -98,4 +56,4 @@ module.exports.set = password =>
  * @return Promise<boolean>
  */
 module.exports.test = password =>
-	getHash().then(hash => verify(hash, password));
+	hashFile.get().then(value => verify(value, password));
