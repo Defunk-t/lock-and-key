@@ -1,5 +1,5 @@
 const {app, BrowserWindow, ipcMain} = require('electron');
-const {isDataInitialised, onboard, unlock} = require('./data');
+const {isDataInitialised, onboard, testPassword} = require('./data');
 const createWindow = require('./window');
 
 /**
@@ -8,9 +8,9 @@ const createWindow = require('./window');
  */
 const initWindow = () => new Promise(resolve => isDataInitialised().then(DATA_INIT => {
 
-	const WINDOW  = DATA_INIT ? 'unlock' : 'setup'  ;
-	const EVENT   = DATA_INIT ?  WINDOW  : 'onboard';
-	const HANDLER = DATA_INIT ?  unlock  :  onboard ;
+	const WINDOW  = DATA_INIT ?   'unlock'   :  'setup' ;
+	const EVENT   = DATA_INIT ?    WINDOW    : 'onboard';
+	const HANDLER = DATA_INIT ? testPassword :  onboard ;
 
 	ipcMain.handle(EVENT, (event, password) => HANDLER(password));
 
