@@ -1,6 +1,6 @@
-import {createElement} from '../lib/ui/index.js';
+import {createElement, Singleton} from '../lib/ui/index.js';
 
-document.body.append(createElement('div', {}, container => {
+export default Singleton(functions => createElement('div', {}, container => {
 
 	/**
 	 * The password input box.
@@ -58,7 +58,8 @@ document.body.append(createElement('div', {}, container => {
 					submit.value = "...";
 					window.API.unlock(input.value)
 						.then(valid => {
-							if (!valid) setError();
+							if (valid) functions.destroy();
+							else setError();
 						}, setError);
 				}
 			},

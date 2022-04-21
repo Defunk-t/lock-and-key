@@ -1,5 +1,5 @@
 const {app, BrowserWindow} = require('electron');
-const createWindow = require('./window');
+const {createOnboardWindow, createAppWindow} = require('./window');
 const Data = require('./data');
 
 /**
@@ -8,7 +8,7 @@ const Data = require('./data');
  */
 const initWindow = () =>
 	Data.isInitialised()
-		.then(isInit => createWindow(isInit ? 'unlock' : 'onboard'));
+		.then(isInit => isInit ? createAppWindow() : createOnboardWindow());
 
 // Called when Electron has finished initialising
 app.whenReady().then(() => {
