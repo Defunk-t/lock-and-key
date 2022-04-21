@@ -1,6 +1,6 @@
 const {join} = require('path');
 
-const {generateKey} = require('openpgp');
+const {generateKey, readPrivateKey, decryptKey, encryptKey} = require('openpgp');
 
 const DATA_DIR = require('./data-directory.js');
 const File = require('./file.js');
@@ -51,3 +51,20 @@ module.exports.generate = passphrase => {
 		};
 	});
 };
+
+const decryptPrivateKey = passphrase =>
+	privateKeyFile.get()
+		.then(armoredKey => readPrivateKey({
+			armoredKey
+		}))
+		.then(privateKey => decryptKey({
+			privateKey,
+			passphrase
+		}));
+
+const setPassphrase = (oldPassphrase, newPassphrase) =>
+	decryptPrivateKey(oldPassphrase)
+		.then(privateKey => encryptKey({
+			privateKey,
+			passphrase: newPassphrase
+		}));
