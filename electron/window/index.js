@@ -47,5 +47,5 @@ module.exports = createWindow = windowType => {
 
 	// Load the corresponding HTML for the window from the client folder
 	// Returned promise fulfils with the BrowserWindow object
-	return window.loadFile(`client/${windowType}.html`).then(() => window);
+	return window.loadFile(`client/${windowType}/index.html`).then(() => window);
 };

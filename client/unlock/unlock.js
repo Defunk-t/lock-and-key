@@ -1,9 +1,6 @@
-import {createElement, Singleton} from "../lib/ui/index.js";
+import {createElement} from '../lib/ui/index.js';
 
-/**
- * Login form API.
- */
-export default Singleton(functions => createElement('div', {}, container => {
+document.body.append(createElement('div', {}, container => {
 
 	/**
 	 * The password input box.
@@ -16,9 +13,6 @@ export default Singleton(functions => createElement('div', {}, container => {
 		name: 'password',
 		type: 'password',
 		placeholder: "Master Password"
-		//oninvalid: event => { // TODO
-		//	event.preventDefault();
-		//}
 	});
 
 	/**
@@ -32,34 +26,14 @@ export default Singleton(functions => createElement('div', {}, container => {
 	});
 
 	/**
-	 * Authentication succeeded callback.
-	 */
-	const authSuccess = () => { // TODO
-		functions.destroy();
-	};
-
-	/**
 	 * Authentication failed callback.
 	 * @return void
 	 */
-	const authFail = () => {
+	const setError = () => {
 		input.disabled = submit.disabled = false;
 		submit.value = "Unlock";
 		input.value = "";
 		input.focus();
-	};
-
-	/**
-	 * Authenticate the login form.
-	 * @param {Event} [event]
-	 * @return void
-	 */
-	const authenticate = event => {
-		if (event) event.preventDefault();
-		input.disabled = submit.disabled = true;
-		submit.value = "...";
-		window.API.unlock(input.value)
-			.then(valid => valid ? authSuccess() : authFail(), authFail);
 	};
 
 	// Set up the Singleton
@@ -78,8 +52,17 @@ export default Singleton(functions => createElement('div', {}, container => {
 		createElement('form',
 			{
 				id: 'login-form',
-				onsubmit: authenticate
+				onsubmit: event => {
+					event.preventDefault();
+					input.disabled = submit.disabled = true;
+					submit.value = "...";
+					window.API.unlock(input.value)
+						.then(valid => {
+							if (!valid) setError();
+						}, setError);
+				}
 			},
+
 			// Append elements to the form
 			form => form.append(
 
