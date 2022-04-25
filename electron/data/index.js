@@ -40,8 +40,11 @@ module.exports.onboard = password =>
 	});
 
 /**
- * Test the given password string against the hash.
+ * Unlock the user's private key.
+ * Returns the decrypted private key on success, otherwise returns `NULL`.
  * @param {string} password
- * @return Promise<boolean>
+ * @return Promise<PrivateKey|null>
  */
-module.exports.testPassword = Password.test;
+module.exports.unlock = password =>
+	Password.test(password)
+		.then(pwValid => pwValid ? Keys.decryptKey(password) : null);

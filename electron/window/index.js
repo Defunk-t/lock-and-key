@@ -1,6 +1,6 @@
 const {join} = require('path');
 const {BrowserWindow, ipcMain} = require('electron');
-const {testPassword, onboard} = require('../data');
+const {unlock, onboard} = require('../data');
 
 /**
  * Opens a browser window. Returns a Promise that fulfills with the BrowserWindow object.
@@ -38,7 +38,12 @@ const createWindow = windowType => {
 const createAppWindow = () =>
 	createWindow('app')
 		.then(window => {
-			ipcMain.handle('unlock', (event, password) => testPassword(password));
+			ipcMain.handle('unlock', (event, password) =>
+				unlock(password).then(privateKey => {
+					if (privateKey) ipcMain.removeHandler('unlock');
+					return privateKey;
+				})
+			);
 			return window.on('closed', () => ipcMain.removeHandler('unlock'));
 		});
 

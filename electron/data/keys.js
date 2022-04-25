@@ -68,3 +68,5 @@ const setPassphrase = (oldPassphrase, newPassphrase) =>
 			privateKey,
 			passphrase: newPassphrase
 		}));
+
+module.exports.decryptKey = decryptPrivateKey;
