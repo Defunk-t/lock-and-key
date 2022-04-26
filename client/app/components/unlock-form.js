@@ -1,5 +1,6 @@
-import {createElement, Singleton} from '../lib/ui/index.js';
-import {setKey} from '../lib/data.js';
+import {createElement, Singleton} from '../../lib/ui/index.js';
+import {setKey} from '../../lib/data.js';
+import {fire} from '../../lib/events.js';
 
 export default Singleton(functions => createElement('div', {}, container => {
 
@@ -60,6 +61,7 @@ export default Singleton(functions => createElement('div', {}, container => {
 					window.API.unlock(input.value)
 						.then(key => {
 							if (key) {
+								fire('unlock');
 								setKey(key);
 								functions.destroy();
 							}
