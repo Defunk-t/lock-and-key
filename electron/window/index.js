@@ -1,6 +1,6 @@
 const {join} = require('path');
 const {BrowserWindow, ipcMain} = require('electron');
-const {unlock, onboard} = require('../data');
+const {unlock, onboard, readAccountIndex, writeAccountIndex} = require('../data');
 
 /**
  * Opens a browser window. Returns a Promise that fulfills with the BrowserWindow object.
@@ -44,6 +44,8 @@ const createAppWindow = () =>
 					return privateKey;
 				})
 			);
+			ipcMain.handleOnce('get/accountIndex', () => readAccountIndex());
+			ipcMain.handle('write/accountIndex', (event, payload) => writeAccountIndex(payload));
 			return window.on('closed', () => ipcMain.removeHandler('unlock'));
 		});
 

@@ -1,5 +1,11 @@
+const {join} = require('path');
+
+const DATA_DIR = require('./data-directory.js');
+const {File} = require('./file.js');
 const Password = require('./password.js');
 const Keys = require('./keys.js');
+
+const accountsIndexFile = File(join(DATA_DIR, 'index'));
 
 /**
  * @type boolean
@@ -48,3 +54,15 @@ module.exports.onboard = password =>
 module.exports.unlock = password =>
 	Password.test(password)
 		.then(pwValid => pwValid ? Keys.decryptKey(password) : null);
+
+/**
+ * Returns the raw content of the user's account index file or `NULL` if not exists.
+ * @type {function: Promise<?string>}
+ */
+module.exports.readAccountIndex = accountsIndexFile.get;
+
+/**
+ * Overwrites the user's account index file with the string given.
+ * @type {function(string): Promise<void>}
+ */
+module.exports.writeAccountIndex = accountsIndexFile.set;
