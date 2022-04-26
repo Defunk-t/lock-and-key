@@ -1,11 +1,54 @@
 const {readFile, writeFile, rm} = require('fs/promises');
 
-/**
- * Returns a simple read-only file getter/setter for the given file path.
- * @param {PathLike} path
- * @constructor
- */
-module.exports = path => {
+const File = path => {
+
+	/**
+	 * Read the file contents. Returns a promise that resolves with the files contents in a string if it exists,
+	 * otherwise resolves `NULL`.
+	 * @return Promise<?string>
+	 */
+	const get = () => {
+		console.log(`Reading from ${path}`);
+		return readFile(path, 'utf8')
+			.catch(() => null);
+	};
+
+	/**
+	 * Deletes the file.
+	 * @return Promise<void>
+	 */
+	const del = () => rm(path);
+
+	return {
+
+		/**
+		 * Overwrite the file with the given data payload.
+		 * @param {string} data
+		 * @return Promise<void>
+		 */
+		set: data => {
+			console.log(`Writing to ${path}`);
+			const write = () => writeFile(path, data, {mode: 0o400});
+			return del().then(write, write);
+		},
+
+		/**
+		 * Check if this file or data exists.
+		 * @return Promise<boolean>
+		 */
+		isSet: () =>
+			get().then(value => !!value),
+
+		get,
+		del
+	};
+};
+
+const FileCached = path => {
+
+	const file = File(path);
+
+	const {get, set} = file;
 
 	/**
 	 * Current value of file - kept in memory to limit filesystem IOs.
@@ -14,62 +57,33 @@ module.exports = path => {
 	let currentValue;
 
 	/**
-	 * Get the value from the file. Resolves with NULL if file doesn't exist.
+	 * Read the file contents or cached value. Returns a promise that resolves with the files contents in a string
+	 * if it exists, otherwise resolves `NULL`. Value is kept in memory after first call to reduce filesystem IOs.
 	 * @return Promise<?string>
 	 */
-	const read = () => {
-		console.log(`Reading from ${path}`);
-		return readFile(path, 'utf8')
-			.catch(() => null);
-	}
+	file.get = () => !!currentValue
+		? new Promise(resolve => resolve(currentValue))
+		: get().then(data => currentValue = data);
 
 	/**
-	 * Get the current value of the file.
-	 * The value is kept in memory after first call to limit filesystem IOs.
-	 * Resolves with NULL if file doesn't exist.
-	 * @return Promise<?string>
-	 */
-	const get = () =>
-		!!currentValue
-			? new Promise(resolve => resolve(currentValue))
-			: read().then(data => currentValue = data);
-
-	/**
-	 * Delete the file.
+	 * Overwrite the file with the given data payload.
+	 * @param {string} data
 	 * @return Promise<void>
 	 */
-	const del = () => rm(path);
+	file.set = data =>
+		set(currentValue = data);
 
 	/**
-	 * Write or overwrite the current value to the file.
-	 * @return Promise<void>
-	 */
-	const writeValue = () => {
-		console.log(`Writing to ${path}`);
-		const write = () => writeFile(path, currentValue, {mode: 0o400});
-		return del().then(write, write);
-	};
-
-	/**
-	 * Set the value and write file.
-	 * @param {string} value
-	 */
-	const set = value => {
-		currentValue = value;
-		return writeValue();
-	};
-
-	/**
-	 * Check if the file exists/value is set.
+	 * Check if this file or data exists.
 	 * @return Promise<boolean>
 	 */
-	const isSet = () =>
+	file.isSet = () =>
 		get().then(value => !!value);
 
-	return {
-		get,
-		del,
-		set,
-		isSet
-	};
+	return file;
+};
+
+module.exports = {
+	File,
+	FileCached
 };

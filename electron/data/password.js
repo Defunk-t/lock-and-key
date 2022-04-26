@@ -4,8 +4,8 @@ const {cpus, totalmem} = require('os');
 const {argon2id, hash, verify} = require('argon2');
 
 const DATA_DIR = require('./data-directory.js');
-const File = require('./file.js');
-const hashFile = File(join(DATA_DIR, 'hash'));
+const {FileCached} = require('./file.js');
+const hashFile = FileCached(join(DATA_DIR, 'hash'));
 
 /**
  * Argon2 options.

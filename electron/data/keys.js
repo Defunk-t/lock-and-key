@@ -3,9 +3,9 @@ const {join} = require('path');
 const {generateKey, readPrivateKey, decryptKey, encryptKey} = require('openpgp');
 
 const DATA_DIR = require('./data-directory.js');
-const File = require('./file.js');
-const privateKeyFile = File(join(DATA_DIR, 'id_ecdsa'));
-const publicKeyFile  = File(join(DATA_DIR, 'id_ecdsa.pub'));
+const {FileCached} = require('./file.js');
+const privateKeyFile = FileCached(join(DATA_DIR, 'id_ecdsa'));
+const publicKeyFile  = FileCached(join(DATA_DIR, 'id_ecdsa.pub'));
 
 /**
  * Check if keys have been generated.
