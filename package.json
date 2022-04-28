@@ -1,19 +1,19 @@
 {
   "name": "lock-and-key",
-  "version": "0.1.0",
+  "version": "1.0.0-preview",
   "description": "A cyber-security application for password management.",
   "author": "Aidan Loughran",
   "repository": "https://github.com/Defunk-t/lock-and-key.git",
   "license": "GPL-3.0-only",
   "main": "electron/main.js",
   "engines": {
-    "node": ">16"
+    "node": ">16.0.0"
   },
   "scripts": {
     "start": "electron ."
   },
   "devDependencies": {
-    "electron": "18.0.3"
+    "electron": "18.1.0"
   },
   "dependencies": {
     "argon2": "0.28.5",
