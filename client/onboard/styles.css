@@ -1,55 +1,8 @@
-@import "../lib/css/baseline.css";
+@import "../lib/baseline.css";
+@import "../lib/components/form.css";
 
-body {
-    padding: 50px 20px;
-}
-
-h1 {
-    text-align: center;
-    margin: 0 0 20px;
-}
-
-p {
-    margin: 15px 0;
-}
-
-.input-container {
-    position: relative;
-    margin: 20px 0;
-}
-
-label {
+#onboard-form {
     position: absolute;
-    top: 5px;
-    left: 8px;
-    font-size: 0.9em;
-    opacity: 80%;
-}
-
-input {
-    width: 100%;
-    border-radius: 4px;
-    font-size: 1.2em;
-    background: #eee;
-}
-
-input[type=password] {
-    padding: 26px 8px 8px;
-    border: 1px solid #555;
-}
-
-input[type=submit] {
-    border: none;
-    padding: 10px 8px;
-    background: #28f;
-    cursor: pointer;
-}
-
-input:focus {
-    border-color: #28f;
-}
-
-.error {
-    text-align: center;
-    color: #d55;
+    top: 50%;
+    transform: translateY(-50%);
 }

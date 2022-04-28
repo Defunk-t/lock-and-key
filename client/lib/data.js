@@ -41,17 +41,11 @@ export const unlock = passphrase => new Promise(resolve =>
 					privateKey,
 					passphrase
 				}))
-				.then(key => {
-					privateKey = key;
-					inc();
-				});
+				.then(key => inc(privateKey = key));
 
 			window.API.publicKey.get()
 				.then(armoredKey => readKey({armoredKey}))
-				.then(key => {
-					publicKey = key;
-					inc();
-				});
+				.then(key => inc(publicKey = key));
 		}
 	})
 );

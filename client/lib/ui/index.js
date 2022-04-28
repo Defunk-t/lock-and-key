@@ -1,5 +1,3 @@
-import Singleton from './singleton.js';
-
 /**
  * Advanced element creation.
  * @param {string} tagName Element tag name.
@@ -13,11 +11,6 @@ export function createElement(tagName, properties, callback) {
 	return element;
 }
 
-export {
-	Singleton
-};
-
 export default {
-	createElement,
-	Singleton
+	createElement
 };

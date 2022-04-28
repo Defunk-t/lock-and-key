@@ -1,52 +1,27 @@
 import {createElement} from '../lib/ui/index.js';
+import {FormHelper, InputContainer} from '../lib/components/form.js';
 import testPasswordStrength from '../lib/test-password.js';
 
-/**
- * Form inputs.
- * @type Array<HTMLInputElement>
- */
-const inputs = [];
-
-/**
- * Disable or enable all inputs.
- * @param {boolean} boolean
- */
-const setInputsDisabled = boolean => {
-	for (const input of inputs)
-		input.disabled = boolean;
-};
+const formFunctions = FormHelper();
 
 /**
  * Create a password input element.
  * @param {string} id
+ * @param {boolean} [autofocus]
  * @returns HTMLInputElement
  */
-const createInput = id => createElement('input', {
+const createInput = (id, autofocus = false) => createElement('input', {
 	required: true,
 	type: 'password',
-	id: id,
-	name: id
-}, input => inputs.push(input));
-
-/**
- * Create a container element for an input with a label.
- * @param {HTMLInputElement} input
- * @param {string} label
- * @returns HTMLDivElement
- */
-const createFormInput = (input, label) => createElement('div', {}, container => {
-	container.classList.add('input-container');
-	container.append(createElement('label', {
-		for: input.id,
-		innerText: label
-	}), input);
-});
+	autofocus,
+	id
+}, input => formFunctions.addInput(input));
 
 /**
  * Inputs.
  * @type HTMLInputElement
  */
-const passwordInput = createInput('password-input'),
+const passwordInput = createInput('password-input', true),
 	confirmInput = createInput('confirm-input');
 
 /**
@@ -56,14 +31,15 @@ const passwordInput = createInput('password-input'),
 const submit = createElement('input', {
 	id: 'setup-submit',
 	type: 'submit'
-}, submit => inputs.push(submit));
+}, submit => formFunctions.addInput(submit));
 
 /**
  * Error message.
  * @type HTMLParagraphElement
  */
-const errorMsg = createElement('p', {}, element =>
-	element.classList.add('error'));
+const errorMsg = createElement('p', {
+	innerHTML: "&nbsp"
+});
 
 /**
  * Display an error message.
@@ -72,12 +48,10 @@ const errorMsg = createElement('p', {}, element =>
 const setError = message => {
 	errorMsg.innerText = message;
 	submit.value = "Submit";
-	setInputsDisabled(false);
+	formFunctions.disable(false);
 };
 
 export default createElement('form', {
-
-	id: 'setup-form',
 
 	/**
 	 * Handle form submit event.
@@ -89,9 +63,9 @@ export default createElement('form', {
 		event.preventDefault();
 
 		// Temporarily disable form
-		setInputsDisabled(true);
+		formFunctions.disable();
 		submit.value = "...";
-		errorMsg.innerText = "";
+		errorMsg.innerHTML = "&nbsp";
 
 		// Check if passwords match
 		if (passwordInput.value !== confirmInput.value)
@@ -107,12 +81,15 @@ export default createElement('form', {
 form => form.append(
 
 	// Inputs
-	createFormInput(passwordInput, "Password"),
-	createFormInput(confirmInput, "Confirm"),
+	InputContainer(passwordInput, "Password"),
+	InputContainer(confirmInput, "Confirm"),
 
 	// Submit button
 	submit,
 
 	// Error message
-	errorMsg
+	createElement('div', {}, errorContainer => {
+		errorContainer.classList.add('error');
+		errorContainer.append(errorMsg);
+	})
 ));

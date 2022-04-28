@@ -1,2 +1,2 @@
-@import "../lib/css/baseline.css";
-@import "../lib/css/form.css";
+@import "../lib/baseline.css";
+@import "components/unlock-form.css";

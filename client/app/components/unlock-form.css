@@ -1,0 +1,39 @@
+@import "../../lib/components/form.css";
+
+#unlock-form {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #ddd;
+    border-radius: 10px;
+}
+
+#unlock-form p {
+    text-align: center;
+}
+
+#unlock-form .input-container {
+    margin: 0;
+}
+
+#unlock-form form {
+    display: grid;
+    grid-template-columns: max-content min-content;
+    margin: 20px 0 0;
+}
+
+#password-input {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-right: 1px solid #28f;
+}
+#password-input:disabled {
+    border-right-color: gray;
+}
+
+#unlock-form input[type=submit] {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    min-width: 80px;
+}

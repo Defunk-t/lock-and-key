@@ -1,0 +1,64 @@
+.form-container {
+    padding: 0 20px;
+}
+
+.form-container h1 {
+    text-align: center;
+    margin: 20px 0;
+}
+
+.form-container p:not(.error) {
+    margin: 15px 0;
+}
+
+.form-container .input-container {
+    position: relative;
+    margin: 20px 0;
+}
+
+.form-container label {
+    position: absolute;
+    top: 5px;
+    left: 8px;
+    font-size: 0.9em;
+    opacity: 80%;
+}
+
+.form-container input {
+    width: 100%;
+    border-radius: 4px;
+    font-size: 1.2em;
+    background: #eee;
+}
+
+.form-container input[type=password] {
+    padding: 26px 8px 8px;
+    border: 2px solid #555;
+}
+
+.form-container input[type=password]:focus {
+    border-color: #28f;
+}
+
+.form-container input[type=submit] {
+    border: none;
+    padding: 10px 8px;
+    background: #28f;
+    cursor: pointer;
+}
+
+.form-container input[type=submit]:disabled {
+    background: #888;
+    cursor: default;
+}
+
+.form-container .error {
+    display: flex;
+    min-height: 60px;
+}
+
+.form-container .error p {
+    margin: auto;
+    text-align: center;
+    color: #d55;
+}

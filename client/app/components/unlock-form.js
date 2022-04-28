@@ -1,44 +1,53 @@
-import {createElement, Singleton} from '../../lib/ui/index.js';
+import {createElement} from '../../lib/ui/index.js';
+import {FormHelper, InputContainer} from '../../lib/components/form.js';
 import {unlock} from '../../lib/data.js';
 
-export default Singleton(functions => createElement('div', {}, container => {
+const formFunctions = FormHelper();
 
-	/**
-	 * The password input box.
-	 * @type HTMLInputElement
-	 */
-	const input = createElement('input', {
-		required: true,
-		autofocus: true,
-		id: 'login-input',
-		name: 'password',
-		type: 'password',
-		placeholder: "Master Password"
-	});
+/**
+ * Password input box.
+ * @type HTMLInputElement
+ */
+const input = createElement('input', {
+	required: true,
+	type: 'password',
+	autofocus: true,
+	id: 'password-input'
+}, input => formFunctions.addInput(input));
 
-	/**
-	 * The form submit button.
-	 * @type HTMLInputElement
-	 */
-	const submit = createElement('input', {
-		id: 'login-submit',
-		type: 'submit',
-		value: "Unlock"
-	});
+/**
+ * Submit button.
+ * @type HTMLInputElement
+ */
+const submit = createElement('input', {
+	type: 'submit',
+	value: "Unlock"
+}, submit => formFunctions.addInput(submit));
 
-	/**
-	 * Authentication failed callback.
-	 * @return void
-	 */
-	const setError = () => {
-		input.disabled = submit.disabled = false;
-		submit.value = "Unlock";
-		input.value = "";
-		input.focus();
-	};
+/**
+ * Error message.
+ * @type HTMLParagraphElement
+ */
+const errorMsg = createElement('p', {
+	innerHTML: "&nbsp"
+});
 
-	// Set up the Singleton
-	container.classList.add('overlay-container');
+/**
+ * Authentication failed callback
+ * @returns void
+ */
+const setError = message => {
+	errorMsg.innerText = message;
+	input.value = "";
+	submit.value = "Unlock";
+	formFunctions.disable(false);
+	input.focus();
+};
+
+export default createElement('section', {
+	id: 'unlock-form'
+}, container => {
+	container.classList.add('form-container');
 	container.append(
 
 		// Introductory text
@@ -52,32 +61,29 @@ export default Singleton(functions => createElement('div', {}, container => {
 		// Form
 		createElement('form',
 			{
-				id: 'login-form',
 				onsubmit: event => {
 					event.preventDefault();
-					input.disabled = submit.disabled = true;
+					formFunctions.disable();
 					submit.value = "...";
+					errorMsg.innerHTML = "&nbsp";
 					unlock(input.value)
 						.then(pwValid => pwValid
-							? functions.destroy()
-							: setError())
+							? container.remove()
+							: setError("Incorrect password."))
 						.catch(setError);
 				}
 			},
 
 			// Append elements to the form
 			form => form.append(
-
-				// Password label + input
-				createElement('label', {
-					for: 'login-input',
-					innerText: "Password"
-				}),
-				input,
-
-				// Submit button
+				InputContainer(input, "Password"),
 				submit
 			)
-		)
+		),
+
+		createElement('div', {}, errorContainer => {
+			errorContainer.classList.add('error');
+			errorContainer.append(errorMsg);
+		})
 	);
-}));
+});
