@@ -1,12 +1,16 @@
 @import "../lib/css/baseline.css";
 
 body {
-    padding: 20px;
+    padding: 50px 20px;
 }
 
 h1 {
     text-align: center;
     margin: 0 0 20px;
+}
+
+p {
+    margin: 15px 0;
 }
 
 .input-container {
@@ -43,4 +47,9 @@ input[type=submit] {
 
 input:focus {
     border-color: #28f;
+}
+
+.error {
+    text-align: center;
+    color: #d55;
 }

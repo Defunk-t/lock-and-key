@@ -91,9 +91,11 @@ export default createElement('form', {
 		// Temporarily disable form
 		setInputsDisabled(true);
 		submit.value = "...";
+		errorMsg.innerText = "";
 
 		// Check if passwords match
-		if (passwordInput.value !== confirmInput.value) return setError("Passwords do not match.");
+		if (passwordInput.value !== confirmInput.value)
+			return setError("Passwords do not match.");
 
 		// Test password strength then start onboard process
 		const error = testPasswordStrength(passwordInput.value);
