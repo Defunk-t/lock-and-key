@@ -1,7 +1,12 @@
 import {createElement} from '../../lib/ui/index.js';
 
-export const container = createElement('div', {
-	id: 'app-content'
-});
+import accountList from './account-list.js';
 
-export default container;
+export default createElement('div', {
+	id: 'app-content'
+}, container => container.append(
+	createElement('h1', {
+		innerText: "Accounts"
+	}),
+	accountList
+));
