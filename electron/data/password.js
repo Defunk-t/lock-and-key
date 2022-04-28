@@ -3,8 +3,8 @@ const {cpus, totalmem} = require('os');
 
 const {argon2id, hash, verify} = require('argon2');
 
-const DATA_DIR = require('./data-directory.js');
-const {FileCached} = require('./file.js');
+const DATA_DIR = require('./data-dir.js');
+const {FileCached} = require('./data-file.js');
 const hashFile = FileCached(join(DATA_DIR, 'hash'));
 
 /**

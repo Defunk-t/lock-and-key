@@ -3,7 +3,7 @@ const {createOnboardWindow, createAppWindow} = require('./window');
 const Data = require('./data');
 
 /**
- * Opens the 'onboard' or 'setup' window, depending on whether the user's data has yet been initialised.
+ * Opens the 'onboard' or 'app' window, depending on whether the user's data has yet been initialised.
  * @return Promise<Electron.CrossProcessExports.BrowserWindow>
  */
 const initWindow = () =>

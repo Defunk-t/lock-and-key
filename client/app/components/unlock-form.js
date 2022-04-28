@@ -1,6 +1,5 @@
 import {createElement, Singleton} from '../../lib/ui/index.js';
-import {setKey} from '../../lib/data.js';
-import {fire} from '../../lib/events.js';
+import {unlock} from '../../lib/data.js';
 
 export default Singleton(functions => createElement('div', {}, container => {
 
@@ -58,15 +57,11 @@ export default Singleton(functions => createElement('div', {}, container => {
 					event.preventDefault();
 					input.disabled = submit.disabled = true;
 					submit.value = "...";
-					window.API.unlock(input.value)
-						.then(key => {
-							if (key) {
-								fire('unlock');
-								setKey(key);
-								functions.destroy();
-							}
-							else setError();
-						}, setError);
+					unlock(input.value)
+						.then(pwValid => pwValid
+							? functions.destroy()
+							: setError())
+						.catch(setError);
 				}
 			},
 

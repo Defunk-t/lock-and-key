@@ -1,6 +1,6 @@
 const {join} = require('path');
 const {BrowserWindow, ipcMain} = require('electron');
-const {unlock, onboard, readAccountIndex, writeAccountIndex} = require('../data');
+const Data = require('../data');
 
 /**
  * Opens a browser window. Returns a Promise that fulfills with the BrowserWindow object.
@@ -38,22 +38,40 @@ const createWindow = windowType => {
 const createAppWindow = () =>
 	createWindow('app')
 		.then(window => {
-			ipcMain.handle('unlock', (event, password) =>
-				unlock(password).then(privateKey => {
-					if (privateKey) ipcMain.removeHandler('unlock');
-					return privateKey;
-				})
+
+			ipcMain.handle('POST/testPass', (event, password) =>
+				Data.testPassword(password)
 			);
-			ipcMain.handleOnce('get/accountIndex', () => readAccountIndex());
-			ipcMain.handle('write/accountIndex', (event, payload) => writeAccountIndex(payload));
-			return window.on('closed', () => ipcMain.removeHandler('unlock'));
+
+			ipcMain.handle('GET/privateKey', Data.getPrivateKey);
+			ipcMain.handle('GET/publicKey', Data.getPublicKey);
+			ipcMain.handleOnce('GET/accountIndex', Data.readAccountIndex);
+
+			ipcMain.handle('POST/privateKey', (event, payload) =>
+				Data.setPrivateKey(payload)
+			);
+			ipcMain.handle('POST/publicKey', (event, payload) =>
+				Data.setPublicKey(payload)
+			);
+			ipcMain.handle('POST/accountIndex', (event, payload) =>
+				Data.writeAccountIndex(payload)
+			);
+
+			return window.on('closed', () => {
+				ipcMain.removeHandler('GET/privateKey');
+				ipcMain.removeHandler('GET/publicKey');
+				ipcMain.removeHandler('GET/accountIndex');
+				ipcMain.removeHandler('POST/privateKey');
+				ipcMain.removeHandler('POST/publicKey');
+				ipcMain.removeHandler('POST/accountIndex');
+			});
 		});
 
 const createOnboardWindow = () =>
 	createWindow('onboard')
 		.then(window => {
 			ipcMain.handle('onboard', (event, password) =>
-				onboard(password)
+				Data.onboard(password)
 					.then(createAppWindow)
 					.then(() => window.destroy())
 			);

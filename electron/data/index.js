@@ -1,7 +1,7 @@
 const {join} = require('path');
 
-const DATA_DIR = require('./data-directory.js');
-const {File} = require('./file.js');
+const DATA_DIR = require('./data-dir.js');
+const {File} = require('./data-file.js');
 const Password = require('./password.js');
 const Keys = require('./keys.js');
 
@@ -21,8 +21,8 @@ module.exports.isInitialised = () =>
 		if (!dataInitialised === undefined) resolve(dataInitialised);
 		else Password.isSet().then(isSet => {
 			if (!isSet) resolve(dataInitialised = isSet);
-			else Keys.areGenerated().then(areGenerated =>
-				resolve(dataInitialised = areGenerated));
+			else Keys.isSet().then(isSet =>
+				resolve(dataInitialised = isSet));
 		});
 	});
 
@@ -45,15 +45,12 @@ module.exports.onboard = password =>
 			data.writePromise.then(inc));
 	});
 
-/**
- * Unlock the user's private key.
- * Returns the decrypted private key on success, otherwise returns `NULL`.
- * @param {string} password
- * @return Promise<PrivateKey|null>
- */
-module.exports.unlock = password =>
-	Password.test(password)
-		.then(pwValid => pwValid ? Keys.decryptKey(password) : null);
+module.exports.testPassword = Password.test;
+
+module.exports.getPrivateKey = Keys.getPrivateKey;
+module.exports.getPublicKey = Keys.getPublicKey;
+module.exports.setPrivateKey = Keys.setPrivateKey;
+module.exports.setPublicKey = Keys.setPublicKey;
 
 /**
  * Returns the raw content of the user's account index file or `NULL` if not exists.

@@ -1,19 +1,13 @@
 const {join} = require('path');
 
-const {generateKey, readPrivateKey, decryptKey, encryptKey} = require('openpgp');
+const {generateKey} = require('openpgp');
 
-const DATA_DIR = require('./data-directory.js');
-const {FileCached} = require('./file.js');
+const DATA_DIR = require('./data-dir.js');
+const {FileCached} = require('./data-file.js');
 const privateKeyFile = FileCached(join(DATA_DIR, 'id_ecdsa'));
 const publicKeyFile  = FileCached(join(DATA_DIR, 'id_ecdsa.pub'));
 
-/**
- * Check if keys have been generated.
- * @return Promise<boolean>
- */
-module.exports.areGenerated = privateKeyFile.isSet;
-
-module.exports.generate = passphrase => {
+const generate = passphrase => {
 
 	console.log("Generating keys.");
 	const timestamp = Date.now();
@@ -52,21 +46,36 @@ module.exports.generate = passphrase => {
 	});
 };
 
-const decryptPrivateKey = passphrase =>
-	privateKeyFile.get()
-		.then(armoredKey => readPrivateKey({
-			armoredKey
-		}))
-		.then(privateKey => decryptKey({
-			privateKey,
-			passphrase
-		}));
+/**
+ * Check if keys have been generated.
+ * @return Promise<boolean>
+ */
+const isSet = () => new Promise(resolve => {
 
-const setPassphrase = (oldPassphrase, newPassphrase) =>
-	decryptPrivateKey(oldPassphrase)
-		.then(privateKey => encryptKey({
-			privateKey,
-			passphrase: newPassphrase
-		}));
+	let i = 0;
+	let resolved = false;
 
-module.exports.decryptKey = decryptPrivateKey;
+	const doResolve = value => {
+		resolved = true;
+		resolve(value);
+	};
+
+	const test = key => {
+		if (!resolved) {
+			if (!key) doResolve(false);
+			else if (++i === 2) doResolve(true);
+		}
+	};
+
+	privateKeyFile.get().then(test);
+	publicKeyFile.get().then(test);
+});
+
+module.exports = {
+	generate,
+	getPrivateKey: privateKeyFile.get,
+	setPrivateKey: privateKeyFile.set,
+	getPublicKey: publicKeyFile.get,
+	setPublicKey: publicKeyFile.set,
+	isSet
+};
