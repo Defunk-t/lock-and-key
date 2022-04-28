@@ -8,12 +8,11 @@ document.body.append(
 		innerText: "Welcome"
 	}),
 	createElement('p', {
-		innerText: "To begin, please choose a secure master password."
-	}),
-	createElement('p', {
-		innerText: "This password will be used to unlock the app."
+		innerText: "To begin, please choose a secure master password. This password will be used to unlock the app."
 	}),
 
 	// Form
 	onboardForm
 );
+
+document.getElementById('password-input').focus();
