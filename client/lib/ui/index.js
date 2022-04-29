@@ -1,3 +1,5 @@
+import ViewStack from './view-stack.js';
+
 /**
  * Advanced element creation.
  * @param {string} tagName Element tag name.
@@ -11,6 +13,11 @@ export function createElement(tagName, properties, callback) {
 	return element;
 }
 
+export {
+	ViewStack
+};
+
 export default {
-	createElement
+	createElement,
+	ViewStack
 };

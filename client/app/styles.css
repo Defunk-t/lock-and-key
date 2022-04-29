@@ -1,2 +1,17 @@
 @import "../lib/baseline.css";
 @import "components/unlock-form.css";
+@import "components/account-list.css";
+
+body {
+    padding: 20px;
+}
+
+.button {
+    cursor: pointer;
+    border-radius: 4px;
+    padding: 6px 8px;
+}
+
+.button.new {
+    background: #3CB371;
+}

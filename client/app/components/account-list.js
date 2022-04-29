@@ -4,11 +4,21 @@ import {appendFunction} from '../../lib/events.js';
 
 import accountEntry from './account-list-entry.js';
 
-export const accountList = createElement('div', {
-	id: 'account-container'
+const accountList = createElement('div', {
+	id: 'account-list'
 });
 
-export default accountList;
+export default createElement('section', {
+	id: 'account-list-container'
+}, container => container.append(
+	createElement('h1', {
+		innerText: "Accounts"
+	}),
+	createElement('div', {
+		innerText: "New"
+	}, newButton => newButton.classList.add('button', 'new')),
+	accountList
+));
 
 appendFunction('unlock', reload);
 
