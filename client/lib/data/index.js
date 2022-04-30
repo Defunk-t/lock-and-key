@@ -1,14 +1,8 @@
-import {PrivateKey, PublicKey, readKey, decrypt, encrypt, decryptKey, readPrivateKey, createMessage, readMessage} from '../../node_modules/openpgp/dist/openpgp.min.mjs';
-import EventHandler from './event.js';
+import {PrivateKey, PublicKey, readKey, decrypt, encrypt, decryptKey, readPrivateKey, createMessage, readMessage} from '../../../node_modules/openpgp/dist/openpgp.min.mjs';
+import EventHandler from '../event.js';
 
-const ID_CHARS = "0123456789abcdefghijklmnopqrstuvwxyz";
-
-function generateID() {
-	let id = "";
-	for (let i = 0; i < 8; i++)
-		id += ID_CHARS.charAt(Math.floor(Math.random() * (ID_CHARS.length - 1)));
-	return id;
-}
+import testPassword from './test-password.js';
+import generateID from './generate-id.js';
 
 const UNLOCK_EVENT = EventHandler();
 
@@ -101,7 +95,12 @@ export const addAccount = data => {
 
 export const onUnlock = UNLOCK_EVENT.registerFunction;
 
+export {
+	testPassword
+};
+
 export default {
+	testPassword,
 	unlock,
 	onUnlock,
 	getAccountIndex,

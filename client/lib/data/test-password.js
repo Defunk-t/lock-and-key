@@ -8,7 +8,5 @@
  * @param {string} password
  * @return string|null
  */
-export const testPassword = password =>
+export default password =>
 	password.length < 8 ? "Password should be a minimum of 8 characters." : null;
-
-export default testPassword;

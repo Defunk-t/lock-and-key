@@ -1,6 +1,6 @@
 import {createElement} from '../lib/ui/index.js';
 import {FormHelper, InputContainer} from '../lib/components/form.js';
-import testPasswordStrength from '../lib/test-password.js';
+import testPasswordStrength from '../lib/data/test-password.js';
 
 const formFunctions = FormHelper();
 

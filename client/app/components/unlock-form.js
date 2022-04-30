@@ -1,6 +1,6 @@
 import {createElement} from '../../lib/ui/index.js';
 import {FormHelper, InputContainer} from '../../lib/components/form.js';
-import {unlock} from '../../lib/data.js';
+import {unlock} from '../../lib/data/index.js';
 
 import viewStack from './view.js';
 import accountList from './account-list.js';

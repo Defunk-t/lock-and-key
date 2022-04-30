@@ -1,5 +1,5 @@
 import {createElement} from '../../lib/ui/index.js';
-import {getAccountIndex, onUnlock} from '../../lib/data.js';
+import {getAccountIndex, onUnlock} from '../../lib/data/index.js';
 
 import viewStack from './view.js';
 import AccountEditor from './account-editor.js';

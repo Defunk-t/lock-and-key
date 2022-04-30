@@ -1,4 +1,4 @@
-import {addAccount} from '../../lib/data.js';
+import {addAccount} from '../../lib/data/index.js';
 import {createElement} from '../../lib/ui/index.js';
 import {FormHelper, InputContainer} from '../../lib/components/form.js';
 
