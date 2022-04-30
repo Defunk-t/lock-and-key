@@ -2,6 +2,8 @@ import {createElement} from '../../lib/ui/index.js';
 import {getAccountIndex} from '../../lib/data.js';
 import {appendFunction} from '../../lib/events.js';
 
+import viewStack from './view.js';
+import AccountEditor from './account-editor.js';
 import accountEntry from './account-list-entry.js';
 
 const accountList = createElement('div', {
@@ -14,9 +16,11 @@ export default createElement('section', {
 	createElement('h1', {
 		innerText: "Accounts"
 	}),
-	createElement('div', {
-		innerText: "New"
-	}, newButton => newButton.classList.add('button', 'new')),
+	createElement('button', {
+		type: 'button',
+		innerText: "New",
+		onclick: () => viewStack.push(AccountEditor())
+	}, newButton => newButton.classList.add('new')),
 	accountList
 ));
 

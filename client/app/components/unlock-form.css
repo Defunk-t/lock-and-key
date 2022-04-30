@@ -26,10 +26,7 @@
 #password-input {
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
-    border-right: 1px solid #28f;
-}
-#password-input:disabled {
-    border-right-color: gray;
+    border-right: none;
 }
 
 #unlock-form input[type=submit] {

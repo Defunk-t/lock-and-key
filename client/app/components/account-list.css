@@ -1,9 +1,0 @@
-#account-list-container {
-    position: relative;
-}
-
-#account-list-container .button.new {
-    position: absolute;
-    top: 0;
-    right: 0;
-}

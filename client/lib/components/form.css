@@ -31,11 +31,13 @@
     background: #eee;
 }
 
+.form-container input[type=text],
 .form-container input[type=password] {
     padding: 26px 8px 8px;
     border: 2px solid #555;
 }
 
+.form-container input[type=text]:focus,
 .form-container input[type=password]:focus {
     border-color: #28f;
 }
@@ -43,11 +45,12 @@
 .form-container input[type=submit] {
     border: none;
     padding: 10px 8px;
-    background: #28f;
     cursor: pointer;
+    background: #28f;
 }
 
-.form-container input[type=submit]:disabled {
+.form-container input[type=submit]:disabled,
+.form-container input[type=submit]:active {
     background: #888;
     cursor: default;
 }
