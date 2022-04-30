@@ -3,6 +3,10 @@ const {BrowserWindow, ipcMain} = require('electron');
 const Data = require('../data');
 
 /**
+ * @typedef {'privateKey'|'publicKey'|'accountIndex'|string} DataFileName
+ */
+
+/**
  * Opens a browser window. Returns a Promise that fulfills with the BrowserWindow object.
  * @param {'app'|'onboard'} windowType
  * @return Promise<Electron.CrossProcessExports.BrowserWindow>
@@ -39,31 +43,52 @@ const createAppWindow = () =>
 	createWindow('app')
 		.then(window => {
 
-			ipcMain.handle('POST/testPass', (event, password) =>
-				Data.testPassword(password)
+			ipcMain.handle('POST/testPass',
+				/**
+				 * @param {IpcMainInvokeEvent} event
+				 * @param {string} password
+				 * @returns Promise<boolean>
+				 */
+				(event, password) => Data.testPassword(password)
 			);
 
-			ipcMain.handle('GET/privateKey', Data.getPrivateKey);
-			ipcMain.handle('GET/publicKey', Data.getPublicKey);
-			ipcMain.handleOnce('GET/accountIndex', Data.readAccountIndex);
+			ipcMain.handle('GET/file',
+				/**
+				 * @param {IpcMainInvokeEvent} event
+				 * @param {DataFileName} fileName
+				 * @returns Promise<string|null>
+				 */
+				(event, fileName) => {
+					switch (fileName) {
+						case 'privateKey'   : return Data.getPrivateKey();
+						case 'publicKey'    : return Data.getPublicKey();
+						case 'accountIndex' : return Data.readAccountIndex();
+						default             : return new Promise(resolve => resolve());
+					}
+				}
+			);
 
-			ipcMain.handle('POST/privateKey', (event, payload) =>
-				Data.setPrivateKey(payload)
-			);
-			ipcMain.handle('POST/publicKey', (event, payload) =>
-				Data.setPublicKey(payload)
-			);
-			ipcMain.handle('POST/accountIndex', (event, payload) =>
-				Data.writeAccountIndex(payload)
+			ipcMain.handle('POST/file',
+				/**
+				 * @param {IpcMainInvokeEvent} event
+				 * @param {DataFileName} fileName
+				 * @param {string} payload
+				 * @returns Promise<void>
+				 */
+				(event, fileName, payload) => {
+					switch (fileName) {
+						case 'privateKey'   : return Data.setPrivateKey(payload);
+						case 'publicKey'    : return Data.setPublicKey(payload);
+						case 'accountIndex' : return Data.writeAccountIndex(payload);
+						default             : return new Promise(resolve => resolve());
+					}
+				}
 			);
 
 			return window.on('closed', () => {
-				ipcMain.removeHandler('GET/privateKey');
-				ipcMain.removeHandler('GET/publicKey');
-				ipcMain.removeHandler('GET/accountIndex');
-				ipcMain.removeHandler('POST/privateKey');
-				ipcMain.removeHandler('POST/publicKey');
-				ipcMain.removeHandler('POST/accountIndex');
+				ipcMain.removeHandler('POST/testPass')
+				ipcMain.removeHandler('GET/file');
+				ipcMain.removeHandler('POST/file');
 			});
 		});
 

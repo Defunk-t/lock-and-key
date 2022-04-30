@@ -7,6 +7,16 @@ import generateID from './generate-id.js';
 const UNLOCK_EVENT = EventHandler();
 
 /**
+ * @property {function(password:string):Promise<boolean>} testPassword
+ * Verify the password against the password hash.
+ * @property {function(fileName:DataFileName):Promise<string|null>} readFile
+ * Get a file from the main process over IPC.
+ * @property {function(fileName:DataFileName,payload:string):Promise<void>} writeFile
+ * Send a payload over IPC to overwrite a file with.
+ */
+const API = window.API;
+
+/**
  * @type Object
  */
 let accountIndex;
@@ -27,7 +37,7 @@ let publicKey;
  * @returns Promise<boolean>
  */
 export const unlock = passphrase => new Promise(resolve =>
-	window.API.testPassword(passphrase).then(pwValid => {
+	API.testPassword(passphrase).then(pwValid => {
 		if (!pwValid) resolve(false);
 		else {
 
@@ -40,7 +50,7 @@ export const unlock = passphrase => new Promise(resolve =>
 				}
 			};
 
-			window.API.privateKey.get()
+			API.readFile('privateKey')
 				.then(armoredKey => readPrivateKey({armoredKey}))
 				.then(privateKey => decryptKey({
 					privateKey,
@@ -48,7 +58,7 @@ export const unlock = passphrase => new Promise(resolve =>
 				}))
 				.then(key => inc(privateKey = key));
 
-			window.API.publicKey.get()
+			API.readFile('publicKey')
 				.then(armoredKey => readKey({armoredKey}))
 				.then(key => inc(publicKey = key));
 		}
@@ -61,7 +71,7 @@ export const unlock = passphrase => new Promise(resolve =>
  */
 export const getAccountIndex = () => accountIndex
 	? new Promise(resolve => resolve(accountIndex))
-	: window.API.accountIndex.get()
+	: API.readFile('accountIndex')
 		.then(armoredMessage => readMessage({
 			armoredMessage
 		}))
@@ -83,7 +93,7 @@ const writeAccountIndex = () =>
 			message,
 			encryptionKeys: publicKey
 		}))
-		.then(window.API.accountIndex.write);
+		.then(payload => API.writeFile('accountIndex', payload));
 
 export const addAccount = data => {
 	let id;
