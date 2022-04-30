@@ -111,11 +111,14 @@ export const addAccount = data => {
 	delete data.id;
 	accountIndex[id] = data;
 
-	EVENT_ACCOUNT_UPDATE.fire(fn => fn({
-		id,
-		...data
-	}));
+	EVENT_ACCOUNT_UPDATE.fire();
 
+	return writeAccountIndex();
+};
+
+export const deleteAccount = id => {
+	delete accountIndex[id];
+	EVENT_ACCOUNT_UPDATE.fire();
 	return writeAccountIndex();
 };
 
@@ -147,5 +150,6 @@ export default {
 	unlock,
 	onUnlock,
 	getAccountIndex,
-	addAccount
+	addAccount,
+	deleteAccount
 };

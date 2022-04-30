@@ -1,4 +1,4 @@
-import {addAccount} from '../../lib/data/index.js';
+import {addAccount, deleteAccount} from '../../lib/data/index.js';
 import {createElement} from '../../lib/ui/index.js';
 import {FormHelper, InputContainer} from '../../lib/components/form.js';
 
@@ -45,4 +45,13 @@ export default (accountData = {}) => createElement('section', {
 			})
 		))
 	);
+
+	if (accountData.id) container.appendChild(createElement('button', {
+		type: 'button',
+		innerText: 'Delete',
+		onclick: () => {
+			formFunctions.disable();
+			deleteAccount(accountData.id).then(viewStack.pop);
+		}
+	}, deleteButton => deleteButton.classList.add('delete')));
 });
