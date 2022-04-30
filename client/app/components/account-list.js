@@ -1,5 +1,5 @@
 import {createElement} from '../../lib/ui/index.js';
-import {getAccountIndex, onUnlock} from '../../lib/data/index.js';
+import {getAccountIndex, onUnlock, onAccountChange} from '../../lib/data/index.js';
 
 import viewStack from './view.js';
 import AccountEditor from './account-editor.js';
@@ -35,3 +35,4 @@ const reload = () => getAccountIndex().then(accountIndex => {
 });
 
 onUnlock(reload);
+onAccountChange(reload);
