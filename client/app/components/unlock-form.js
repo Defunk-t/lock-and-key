@@ -1,7 +1,6 @@
 import {createElement} from '../../lib/ui/index.js';
 import {FormHelper, InputContainer} from '../../lib/components/form.js';
 import {unlock} from '../../lib/data.js';
-import {appendFunction} from '../../lib/events.js'
 
 import viewStack from './view.js';
 import accountList from './account-list.js';
@@ -72,9 +71,9 @@ export default createElement('section', {
 					errorMsg.innerHTML = "&nbsp";
 					unlock(input.value)
 						.then(pwValid => pwValid
-							? appendFunction('unlock', () =>
-								viewStack.clear().push(accountList))
-							: setError("Incorrect password."))
+							? viewStack.clear().push(accountList)
+							: setError("Incorrect password.")
+						)
 						.catch(setError);
 				}
 			},

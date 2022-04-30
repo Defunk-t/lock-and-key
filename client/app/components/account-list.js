@@ -1,6 +1,5 @@
 import {createElement} from '../../lib/ui/index.js';
-import {getAccountIndex} from '../../lib/data.js';
-import {appendFunction} from '../../lib/events.js';
+import {getAccountIndex, onUnlock} from '../../lib/data.js';
 
 import viewStack from './view.js';
 import AccountEditor from './account-editor.js';
@@ -24,18 +23,15 @@ export default createElement('section', {
 	accountList
 ));
 
-appendFunction('unlock', reload);
+const reload = () => getAccountIndex().then(accountIndex => {
 
-function reload() {
-	return getAccountIndex()
-		.then(accountIndex => {
+	// Clear the container
+	while (accountList.lastChild)
+		accountList.lastChild.remove();
 
-			// Clear the container
-			while (accountList.lastChild)
-				accountList.lastChild.remove();
+	// Create entries
+	Object.getOwnPropertyNames(accountIndex)
+		.forEach(property => accountList.append(accountEntry(accountIndex[property])));
+});
 
-			// Create entries
-			Object.getOwnPropertyNames(accountIndex)
-				.forEach(property => accountList.append(accountEntry(accountIndex[property])));
-		});
-}
+onUnlock(reload);

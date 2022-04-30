@@ -1,5 +1,5 @@
 import {PrivateKey, PublicKey, readKey, decrypt, encrypt, decryptKey, readPrivateKey, createMessage, readMessage} from '../../node_modules/openpgp/dist/openpgp.min.mjs';
-import {fire} from './events.js';
+import EventHandler from './event.js';
 
 const ID_CHARS = "0123456789abcdefghijklmnopqrstuvwxyz";
 
@@ -9,6 +9,8 @@ function generateID() {
 		id += ID_CHARS.charAt(Math.floor(Math.random() * (ID_CHARS.length - 1)));
 	return id;
 }
+
+const UNLOCK_EVENT = EventHandler();
 
 /**
  * @type Object
@@ -40,7 +42,7 @@ export const unlock = passphrase => new Promise(resolve =>
 			const inc = () => {
 				if (++i === 2) {
 					resolve(true);
-					fire('unlock');
+					UNLOCK_EVENT.fire().clearFunctions();
 				}
 			};
 
@@ -97,8 +99,11 @@ export const addAccount = data => {
 	return writeAccountIndex();
 };
 
+export const onUnlock = UNLOCK_EVENT.registerFunction;
+
 export default {
 	unlock,
+	onUnlock,
 	getAccountIndex,
 	addAccount
 };
