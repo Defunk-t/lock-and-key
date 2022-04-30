@@ -5,7 +5,7 @@ import {FormHelper, InputContainer} from '../../lib/components/form.js';
 import viewStack from './view.js';
 import backButton from './button-back.js';
 
-export default () => createElement('section', {
+export default (accountData = {}) => createElement('section', {
 	id: 'account-editor-container'
 }, container => {
 
@@ -16,28 +16,29 @@ export default () => createElement('section', {
 	container.append(
 		backButton("Cancel"),
 		createElement('h1', {
-			innerText: "Add Account"
+			innerText: `${accountData.id ? "Edit" : "Add"} Account`
 		}),
 		createElement('form', {
 			onsubmit: event => {
 				event.preventDefault();
 				formFunctions.disable();
-				const data = {};
 				for (const input of event.target)
-					if (input.type !== 'submit')
-						data[input.name] = input.value;
-				addAccount(data)
+					if (input.type !== 'submit' && input.value.trim() !== "")
+						accountData[input.name] = input.value;
+				addAccount(accountData)
 					.then(() => viewStack.pop());
 			}
 		}, form => form.append(
 			InputContainer(createElement('input', {
 				required: true,
 				type: 'text',
-				name: 'service'
+				name: 'service',
+				value: accountData.service ?? ''
 			}, input => formFunctions.addInput(input)), "Service"),
 			InputContainer(createElement('input', {
-				type: 'text',
-				name: 'email'
+				type: 'email',
+				name: 'email',
+				value: accountData.email ?? ''
 			}, input => formFunctions.addInput(input)), "Email address"),
 			createElement('input', {
 				type: 'submit'

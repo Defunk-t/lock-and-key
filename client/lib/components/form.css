@@ -32,13 +32,15 @@
 }
 
 .form-container input[type=text],
-.form-container input[type=password] {
+.form-container input[type=password],
+.form-container input[type=email] {
     padding: 26px 8px 8px;
     border: 2px solid #555;
 }
 
 .form-container input[type=text]:focus,
-.form-container input[type=password]:focus {
+.form-container input[type=password]:focus,
+.form-container input[type=email]:focus {
     border-color: #28f;
 }
 

@@ -31,7 +31,10 @@ const reload = () => getAccountIndex().then(accountIndex => {
 
 	// Create entries
 	Object.getOwnPropertyNames(accountIndex)
-		.forEach(property => accountList.append(accountEntry(accountIndex[property])));
+		.forEach(accountID => accountList.append(accountEntry({
+			id: accountID,
+			...accountIndex[accountID]
+		})));
 });
 
 onUnlock(reload);

@@ -100,14 +100,22 @@ const writeAccountIndex = () =>
 		.then(payload => API.writeFile('accountIndex', payload));
 
 export const addAccount = data => {
-	let id;
-	while (!id || accountIndex[id])
-		id = generateID();
-	accountIndex[id] = data
+
+	const id = data.id ?? (() => {
+		let id;
+		while (!id || accountIndex[id])
+			id = generateID();
+		return id;
+	})();
+
+	delete data.id;
+	accountIndex[id] = data;
+
 	EVENT_ACCOUNT_UPDATE.fire(fn => fn({
 		id,
 		...data
 	}));
+
 	return writeAccountIndex();
 };
 
