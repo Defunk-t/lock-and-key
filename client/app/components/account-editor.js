@@ -1,6 +1,8 @@
+import {addAccount} from '../../lib/data.js';
 import {createElement} from '../../lib/ui/index.js';
 import {FormHelper, InputContainer} from '../../lib/components/form.js';
 
+import viewStack from './view.js';
 import backButton from './button-back.js';
 
 export default () => createElement('section', {
@@ -19,8 +21,13 @@ export default () => createElement('section', {
 		createElement('form', {
 			onsubmit: event => {
 				event.preventDefault();
-				// // Contains form element, also array of inputs to act on
-				// console.log(event.target);
+				formFunctions.disable();
+				const data = {};
+				for (const input of event.target)
+					if (input.type !== 'submit')
+						data[input.name] = input.value;
+				addAccount(data)
+					.then(() => viewStack.pop());
 			}
 		}, form => form.append(
 			InputContainer(createElement('input', {

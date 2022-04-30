@@ -13,7 +13,7 @@ function parseName(accountData) {
 		case 'string':
 			return accountData;
 		case 'object':
-			return accountData.name;
+			return accountData.service;
 		default:
 			throw new TypeError();
 	}

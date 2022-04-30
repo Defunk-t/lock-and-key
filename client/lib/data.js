@@ -1,6 +1,15 @@
 import {PrivateKey, PublicKey, readKey, decrypt, encrypt, decryptKey, readPrivateKey, createMessage, readMessage} from '../../node_modules/openpgp/dist/openpgp.min.mjs';
 import {fire} from './events.js';
 
+const ID_CHARS = "0123456789abcdefghijklmnopqrstuvwxyz";
+
+function generateID() {
+	let id = "";
+	for (let i = 0; i < 8; i++)
+		id += ID_CHARS.charAt(Math.floor(Math.random() * (ID_CHARS.length - 1)));
+	return id;
+}
+
 /**
  * @type Object
  */
@@ -71,7 +80,7 @@ export const getAccountIndex = () => accountIndex
  * Overwrite the account index.
  * @returns Promise<void>
  */
-export const writeAccountIndex = () =>
+const writeAccountIndex = () =>
 	getAccountIndex()
 		.then(data => createMessage({text: JSON.stringify(data)}))
 		.then(message => encrypt({
@@ -80,7 +89,16 @@ export const writeAccountIndex = () =>
 		}))
 		.then(window.API.accountIndex.write);
 
+export const addAccount = data => {
+	let id;
+	while (!id || accountIndex[id])
+		id = generateID();
+	accountIndex[id] = data;
+	return writeAccountIndex();
+};
+
 export default {
 	unlock,
-	getAccountIndex
+	getAccountIndex,
+	addAccount
 };
