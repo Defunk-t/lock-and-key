@@ -1,7 +1,8 @@
 const {join} = require('path');
+
 const {BrowserWindow, ipcMain} = require('electron');
-const {onboard, verifyPassword} = require('../data');
-const {read, write} = require('../data/file.js');
+
+const {onboard, verifyPassword, read, write} = require('./data');
 
 /**
  * Opens a browser window. Returns a Promise that fulfills with the BrowserWindow object.

@@ -1,5 +1,5 @@
 const {app, BrowserWindow} = require('electron');
-const {createOnboardWindow, createAppWindow} = require('./window');
+const {createOnboardWindow, createAppWindow} = require('./window.js');
 const {isInitialised} = require('./data');
 
 /**
