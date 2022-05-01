@@ -1,11 +1,13 @@
-const {join} = require('path');
 const {cpus, totalmem} = require('os');
 
 const {argon2id, hash, verify} = require('argon2');
 
-const DATA_DIR = require('./data-dir.js');
-const {FileCached} = require('./data-file.js');
-const hashFile = FileCached(join(DATA_DIR, 'hash'));
+const {FileCached, write} = require('./file.js');
+
+/**
+ * @type FileCached
+ */
+let hashFile;
 
 /**
  * Argon2 options.
@@ -23,37 +25,33 @@ const HASH_OPTIONS = (() => {
 /**
  * Generate an Argon2 hash for the given password.
  * @param {string} password
- * @return Promise<string>
+ * @return {Promise<{writePromise:Promise<void>,value:string}>}
  */
-function generateHash(password) {
+module.exports.generateHash = password => {
 	console.log("Doing a password hash.");
 	const timestamp = Date.now();
 	return hash(password, HASH_OPTIONS)
 		.then(value => {
 			console.log(`Hash took ${Date.now() - timestamp} ms.`);
-			return value;
+			hashFile = null;
+			return {
+				value,
+				writePromise: write('hash', value)
+			}
 		});
-}
+};
 
 /**
- * Check if the master password exists/is set.
- * @return Promise<boolean>
- */
-module.exports.isSet = hashFile.isSet;
-
-
-/**
- * Set or update the master password.
+ * Verify against the password hash.
  * @param {string} password
- * @return Promise<void>
+ * @returns Promise<boolean>
  */
-module.exports.set = password =>
-	generateHash(password).then(hashFile.set);
-
-/**
- * Test the given password string against the hash.
- * @param {string} password
- * @return Promise<boolean>
- */
-module.exports.test = password =>
-	hashFile.get().then(value => verify(value, password));
+module.exports.verifyPassword = password => {
+	hashFile ??= new FileCached('hash');
+	return hashFile.read()
+		.then(hash => verify(hash, password))
+		.then(isValid => {
+			if (isValid) hashFile = null;
+			return isValid;
+		});
+};

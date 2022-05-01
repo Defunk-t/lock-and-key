@@ -1,10 +1,7 @@
 const {join} = require('path');
 const {BrowserWindow, ipcMain} = require('electron');
-const Data = require('../data');
-
-/**
- * @typedef {'privateKey'|'publicKey'|'accountIndex'|string} DataFileName
- */
+const {onboard, verifyPassword} = require('../data');
+const {read, write} = require('../data/file.js');
 
 /**
  * Opens a browser window. Returns a Promise that fulfills with the BrowserWindow object.
@@ -39,69 +36,25 @@ const createWindow = windowType => {
 		.then(() => window);
 };
 
-const createAppWindow = () =>
-	createWindow('app')
-		.then(window => {
+const createAppWindow = () => createWindow('app').then(window => {
+	ipcMain.handle('POST/testPass', (event, password) => verifyPassword(password));
+	ipcMain.handle('GET/file', (event, filename) => read(filename));
+	ipcMain.handle('POST/file', (event, fileName, payload) => write(fileName, payload));
+	return window.on('closed', () => {
+		ipcMain.removeHandler('POST/testPass')
+		ipcMain.removeHandler('GET/file');
+		ipcMain.removeHandler('POST/file');
+	});
+});
 
-			ipcMain.handle('POST/testPass',
-				/**
-				 * @param {IpcMainInvokeEvent} event
-				 * @param {string} password
-				 * @returns Promise<boolean>
-				 */
-				(event, password) => Data.testPassword(password)
-			);
-
-			ipcMain.handle('GET/file',
-				/**
-				 * @param {IpcMainInvokeEvent} event
-				 * @param {DataFileName} fileName
-				 * @returns Promise<string|null>
-				 */
-				(event, fileName) => {
-					switch (fileName) {
-						case 'privateKey'   : return Data.getPrivateKey();
-						case 'publicKey'    : return Data.getPublicKey();
-						case 'accountIndex' : return Data.readAccountIndex();
-						default             : return new Promise(resolve => resolve());
-					}
-				}
-			);
-
-			ipcMain.handle('POST/file',
-				/**
-				 * @param {IpcMainInvokeEvent} event
-				 * @param {DataFileName} fileName
-				 * @param {string} payload
-				 * @returns Promise<void>
-				 */
-				(event, fileName, payload) => {
-					switch (fileName) {
-						case 'privateKey'   : return Data.setPrivateKey(payload);
-						case 'publicKey'    : return Data.setPublicKey(payload);
-						case 'accountIndex' : return Data.writeAccountIndex(payload);
-						default             : return new Promise(resolve => resolve());
-					}
-				}
-			);
-
-			return window.on('closed', () => {
-				ipcMain.removeHandler('POST/testPass')
-				ipcMain.removeHandler('GET/file');
-				ipcMain.removeHandler('POST/file');
-			});
-		});
-
-const createOnboardWindow = () =>
-	createWindow('onboard')
-		.then(window => {
-			ipcMain.handle('onboard', (event, password) =>
-				Data.onboard(password)
-					.then(createAppWindow)
-					.then(() => window.destroy())
-			);
-			return window.on('closed', () => ipcMain.removeHandler('onboard'));
-		});
+const createOnboardWindow = () => createWindow('onboard').then(window => {
+	ipcMain.handle('onboard', (event, password) =>
+		onboard(password)
+			.then(createAppWindow)
+			.then(() => window.destroy())
+	);
+	return window.on('closed', () => ipcMain.removeHandler('onboard'));
+});
 
 module.exports = {
 	createAppWindow,
