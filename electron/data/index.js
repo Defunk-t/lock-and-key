@@ -1,4 +1,4 @@
-const {exists} = require('./file.js');
+const File = require('./file.js');
 const {generateHash, verifyPassword} = require('./password.js');
 const generateKeys = require('./generate-keys.js');
 
@@ -9,7 +9,7 @@ const generateKeys = require('./generate-keys.js');
 const isInitialised = () => new Promise(resolve => {
 	let i = 0;
 	['hash', 'privateKey', 'publicKey'].forEach(fileName =>
-		exists(fileName).then(exists => {
+		File.exists(fileName).then(exists => {
 			if (!exists) resolve(false);
 			else if (++i === 3) resolve(true);
 		})
@@ -32,6 +32,7 @@ const onboard = password => new Promise(resolve => {
 });
 
 module.exports = {
+	...File,
 	isInitialised,
 	onboard,
 	verifyPassword

@@ -1,6 +1,6 @@
 const {join} = require('path');
 const {mkdirSync} = require('fs');
-const {readFile, writeFile, rm} = require('fs/promises');
+const {access, readFile, writeFile, rm} = require('fs/promises');
 
 const {app} = require('electron');
 
@@ -40,11 +40,7 @@ const getPath = fileName => {
  */
 const read = path => {
 	console.log(`Reading from ${path}`);
-	return readFile(path, 'utf8').catch(error => {
-		if (error.code === 'ENOENT') console.log(`Not found: ${path}`)
-		else console.error(error);
-		return null;
-	});
+	return readFile(path, 'utf8').catch(() => null);
 };
 
 /**
@@ -71,7 +67,10 @@ const write = (path, payload) => {
  * @param {string} path
  * @returns Promise<boolean>
  */
-const exists = path => read(path).then(contents => !!contents);
+const exists = path => access(path).then(() => true, () => {
+	console.log(`Not found: ${path}`);
+	return false;
+});
 
 /**
  * Convenience class that remembers the filename for file operations.
