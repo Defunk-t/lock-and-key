@@ -48,7 +48,7 @@ const read = path => {
  * @param {string} path
  * @returns Promise<void>
  */
-const del = path => rm(path);
+const del = path => rm(path).catch(() => {});
 
 /**
  * Overwrite the file with the payload.
@@ -59,7 +59,7 @@ const del = path => rm(path);
 const write = (path, payload) => {
 	console.log(`Writing to ${path}`);
 	const write = () => writeFile(path, payload, {mode: 0o400});
-	return del(path).then(write, write);
+	return del(path).then(write);
 };
 
 /**

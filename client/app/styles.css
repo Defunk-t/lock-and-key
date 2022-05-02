@@ -1,8 +1,11 @@
 @import "../lib/baseline.css";
 @import "components/unlock-form.css";
 @import "components/account-list.css";
-@import "components/account-editor.css";
 
 body {
     padding: 20px;
+}
+
+button.delete {
+    background: #d55;
 }

@@ -11,6 +11,8 @@ import generateID from './generate-id.js';
  * Get a file from the main process over IPC.
  * @property {function(fileName:DataFileName,payload:string):Promise<void>} writeFile
  * Send a payload over IPC to overwrite a file with.
+ * @property {function(filename:DataFileName):Promise<void>} deleteFile
+ * Delete the file.
  */
 const API = window.API;
 
@@ -69,13 +71,29 @@ export const unlock = passphrase => new Promise(resolve =>
 	})
 );
 
+const assertFileName = fileName => {
+	switch (fileName) {
+		case '':
+			throw TypeError("Empty file name given.");
+		case 'privateKey':
+		case 'publicKey':
+		case 'hash':
+			throw TypeError(`'${fileName}' not accessible via this function.`);
+	}
+};
+
 /**
- * Retrieve the account index.
+ * @typedef {'accountIndex'|string} EncryptedJSONFileName
+ */
+
+/**
+ * Retrieve data, decrypt, and parse JSON.
+ * @param {EncryptedJSONFileName} fileName
  * @returns Promise<Object>
  */
-export const getAccountIndex = () => accountIndex
-	? new Promise(resolve => resolve(accountIndex))
-	: API.readFile('accountIndex')
+export const getData = fileName => {
+	assertFileName(fileName);
+	return API.readFile(fileName)
 		.then(armoredMessage => readMessage({
 			armoredMessage
 		}))
@@ -83,23 +101,66 @@ export const getAccountIndex = () => accountIndex
 			message,
 			decryptionKeys: privateKey
 		}))
-		.then(data => accountIndex = JSON.parse(data.data))
-		.catch(() => accountIndex = {});
+		.then(data => JSON.parse(data.data))
+		.catch(() => {
+			return {};
+		});
+}
+
+/**
+ * Promise fulfills with the account index object.
+ * @returns Promise<Object>
+ */
+export const getAccountIndex = () => accountIndex
+	? new Promise(resolve => resolve(accountIndex))
+	: getData('accountIndex')
+		.then(data => {
+			console.log(data);
+			return accountIndex = data;
+		});
+
+/**
+ * Stringify, encrypt, and write data.
+ * @param {EncryptedJSONFileName} fileName
+ * @param {Object} payload
+ * @returns PromiseLike<void>
+ */
+export const writeData = (fileName, payload) => {
+	assertFileName(fileName);
+	return createMessage({text: JSON.stringify(payload)})
+		.then(message => encrypt({
+			message,
+			encryptionKeys: publicKey
+		}))
+		.then(payload => API.writeFile(fileName, payload));
+};
 
 /**
  * Overwrite the account index.
  * @returns Promise<void>
  */
-const writeAccountIndex = () =>
-	getAccountIndex()
-		.then(data => createMessage({text: JSON.stringify(data)}))
-		.then(message => encrypt({
-			message,
-			encryptionKeys: publicKey
-		}))
-		.then(payload => API.writeFile('accountIndex', payload));
+const writeAccountIndex = () => getAccountIndex()
+	.then(data => writeData('accountIndex', data));
 
-export const addAccount = data => {
+/**
+ * @typedef AccountData
+ * @property {string} service
+ * @property {string} [id]
+ * @property {string} [email]
+ * @property {AccountSecrets} [secrets]
+ */
+
+/**
+ * @typedef AccountSecrets
+ * @property {string} [password]
+ */
+
+/**
+ * Add or change account data.
+ * @param {AccountData} data
+ * @returns Promise<void>
+ */
+export const setAccountData = data => new Promise(resolve => {
 
 	const id = data.id ?? (() => {
 		let id;
@@ -108,18 +169,40 @@ export const addAccount = data => {
 		return id;
 	})();
 
+	let i = 0;
+	const inc = () => {
+		if (++i === 2) {
+			EVENT_ACCOUNT_UPDATE.fire();
+			resolve();
+		}
+	};
+
+	if (data.secrets) {
+		writeData(id, data.secrets).then(inc);
+		delete data.secrets;
+	} else API.deleteFile(id).then(inc);
+
 	delete data.id;
 	accountIndex[id] = data;
+	writeAccountIndex().then(inc);
+});
 
-	EVENT_ACCOUNT_UPDATE.fire();
-
-	return writeAccountIndex();
-};
-
+/**
+ * Delete the account.
+ * @param {string} id
+ * @returns Promise<void>
+ */
 export const deleteAccount = id => {
 	delete accountIndex[id];
 	EVENT_ACCOUNT_UPDATE.fire();
-	return writeAccountIndex();
+	return new Promise(resolve => {
+		let i = 0;
+		const inc = () => {
+			if (++i === 2) resolve();
+		};
+		writeAccountIndex().then(inc);
+		API.deleteFile(id).then(inc);
+	});
 };
 
 /**
@@ -135,7 +218,7 @@ export const onUnlock = (...fn) => {
 /**
  * Invoke callback(s) when an account is created/modified.
  * The account data will be passed in.
- * @param {function(Object)} fn
+ * @param {function} fn
  */
 export const onAccountChange = (...fn) => {
 	EVENT_ACCOUNT_UPDATE.registerFunction(...fn);
@@ -148,8 +231,11 @@ export {
 export default {
 	testPassword,
 	unlock,
-	onUnlock,
+	getData,
+	writeData,
 	getAccountIndex,
-	addAccount,
-	deleteAccount
+	setAccountData,
+	deleteAccount,
+	onUnlock,
+	onAccountChange
 };

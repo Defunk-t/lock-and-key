@@ -2,7 +2,7 @@ const {join} = require('path');
 
 const {BrowserWindow, ipcMain} = require('electron');
 
-const {onboard, verifyPassword, read, write} = require('./data');
+const {onboard, verifyPassword, read, write, del} = require('./data');
 
 /**
  * Opens a browser window. Returns a Promise that fulfills with the BrowserWindow object.
@@ -41,10 +41,12 @@ const createAppWindow = () => createWindow('app').then(window => {
 	ipcMain.handle('POST/testPass', (event, password) => verifyPassword(password));
 	ipcMain.handle('GET/file', (event, filename) => read(filename));
 	ipcMain.handle('POST/file', (event, fileName, payload) => write(fileName, payload));
+	ipcMain.handle('DELETE/file', (event, fileName) => del(fileName));
 	return window.on('closed', () => {
 		ipcMain.removeHandler('POST/testPass')
 		ipcMain.removeHandler('GET/file');
 		ipcMain.removeHandler('POST/file');
+		ipcMain.removeHandler('DELETE/file');
 	});
 });
 

@@ -1,3 +1,3 @@
-import {createElement, ViewStack} from "../../lib/ui/index.js";
+import {ViewStack} from "../../lib/ui/index.js";
 
-export default ViewStack(createElement('main', {}, e => document.body.appendChild(e)));
+export default ViewStack(document.body.appendChild(document.createElement('main')));

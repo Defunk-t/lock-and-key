@@ -1,13 +1,11 @@
-import {addAccount, deleteAccount} from '../../lib/data/index.js';
+import {setAccountData, deleteAccount, getData} from '../../lib/data/index.js';
 import {createElement} from '../../lib/ui/index.js';
 import {FormHelper, InputContainer} from '../../lib/components/form.js';
 
 import viewStack from './view.js';
 import backButton from './button-back.js';
 
-export default (accountData = {}) => createElement('section', {
-	id: 'account-editor-container'
-}, container => {
+export default (accountData = {}) => createElement('section', {}, container => {
 
 	const formFunctions = FormHelper();
 
@@ -23,35 +21,55 @@ export default (accountData = {}) => createElement('section', {
 				event.preventDefault();
 				formFunctions.disable();
 				for (const input of event.target)
-					if (input.type !== 'submit' && input.value.trim() !== "")
-						accountData[input.name] = input.value;
-				addAccount(accountData)
+					if (input.type !== 'submit' && input.value.trim() !== "") switch (input.name) {
+						case 'service':
+						case 'email':
+							accountData[input.name] = input.value;
+							break;
+						default:
+							accountData.secrets ??= {};
+							accountData.secrets[input.name] = input.value;
+							break;
+					}
+				setAccountData(accountData)
 					.then(() => viewStack.pop());
 			}
-		}, form => form.append(
-			InputContainer(createElement('input', {
-				required: true,
-				type: 'text',
-				name: 'service',
-				value: accountData.service ?? ''
-			}, input => formFunctions.addInput(input)), "Service"),
-			InputContainer(createElement('input', {
-				type: 'email',
-				name: 'email',
-				value: accountData.email ?? ''
-			}, input => formFunctions.addInput(input)), "Email address"),
-			createElement('input', {
-				type: 'submit'
-			})
-		))
+		}, form => {
+			const populateForm = (accountSecrets = {}) => form.append(
+				InputContainer(createElement('input', {
+					required: true,
+					type: 'text',
+					name: 'service',
+					value: accountData.service ?? ''
+				}, input => formFunctions.addInput(input)), "Service"),
+				InputContainer(createElement('input', {
+					type: 'email',
+					name: 'email',
+					value: accountData.email ?? ''
+				}, input => formFunctions.addInput(input)), "Email address"),
+				InputContainer(createElement('input', {
+					type: 'password',
+					name: 'password',
+					value: accountSecrets.password ?? ''
+				}, input => formFunctions.addInput(input)), "Password"),
+				createElement('div', {}, buttonContainer => {
+					buttonContainer.classList.add('account-editor-buttons');
+					formFunctions.addInput(buttonContainer.appendChild(createElement('input', {
+						type: 'submit',
+						value: 'Save'
+					})));
+					if (accountData.id) formFunctions.addInput(buttonContainer.appendChild(createElement('button', {
+						type: 'button',
+						innerText: 'Delete',
+						onclick: () => {
+							formFunctions.disable();
+							deleteAccount(accountData.id).then(viewStack.pop);
+						}
+					}, deleteButton => deleteButton.classList.add('delete'))));
+				})
+			);
+			if (accountData.id) getData(accountData.id).then(populateForm);
+			else populateForm();
+		})
 	);
-
-	if (accountData.id) container.appendChild(createElement('button', {
-		type: 'button',
-		innerText: 'Delete',
-		onclick: () => {
-			formFunctions.disable();
-			deleteAccount(accountData.id).then(viewStack.pop);
-		}
-	}, deleteButton => deleteButton.classList.add('delete')));
 });

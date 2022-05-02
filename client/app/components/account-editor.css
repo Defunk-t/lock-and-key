@@ -1,1 +1,7 @@
 @import "../../lib/components/form.css";
+
+.account-editor-buttons {
+    display: flex;
+    flex-flow: row nowrap;
+    gap: 10px;
+}

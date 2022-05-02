@@ -24,11 +24,11 @@
     opacity: 80%;
 }
 
+.form-container form button,
 .form-container input {
     width: 100%;
     border-radius: 4px;
     font-size: 1.2em;
-    background: #eee;
 }
 
 .form-container input[type=text],
@@ -36,6 +36,7 @@
 .form-container input[type=email] {
     padding: 26px 8px 8px;
     border: 2px solid #555;
+    background: #eee;
 }
 
 .form-container input[type=text]:focus,
@@ -44,13 +45,19 @@
     border-color: #28f;
 }
 
+.form-container form button,
 .form-container input[type=submit] {
     border: none;
     padding: 10px 8px;
     cursor: pointer;
+}
+
+.form-container input[type=submit] {
     background: #28f;
 }
 
+.form-container form button:disabled,
+.form-container form button:active,
 .form-container input[type=submit]:disabled,
 .form-container input[type=submit]:active {
     background: #888;
