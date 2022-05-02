@@ -5,4 +5,4 @@
 package-lock.json  -diff
 
 # Show in GitHub language stats
-/electron/window/*/config.json  linguist-detectable=true
+/electron/*/config.json  linguist-detectable=true
