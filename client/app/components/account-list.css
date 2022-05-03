@@ -1,1 +1,21 @@
 @import "account-editor.css";
+
+.account-list-entry {
+    cursor: pointer;
+    margin: 10px 0;
+    padding: 8px;
+    border: 1px solid gray;
+    border-radius: 6px;
+}
+
+.account-list-entry:hover {
+    background: #ddd;
+}
+
+.account-list-entry p {
+    margin: 5px;
+}
+
+.account-list-entry .email {
+    opacity: 70%;
+}
