@@ -1,4 +1,4 @@
-import {setAccountData, deleteAccount, getData} from '../../lib/data/index.js';
+import {setAccountData, deleteAccount, getData, generatePassword} from '../../lib/data/index.js';
 import {createElement} from '../../lib/ui/index.js';
 import {FormHelper, InputContainer} from '../../lib/components/form.js';
 
@@ -35,7 +35,18 @@ export default (accountData = {}) => createElement('section', {}, container => {
 					.then(() => viewStack.pop());
 			}
 		}, form => {
-			const populateForm = (accountSecrets = {}) => form.append(
+
+			const passwordInput = createElement('input', {
+				type: 'password',
+				name: 'password'
+			}, input => formFunctions.addInput(input));
+
+			if (accountData.id) getData(accountData.id)
+				.then(accountSecrets => {
+					if (accountSecrets.password) passwordInput.value = accountSecrets.password;
+				});
+
+			form.append(
 				InputContainer(createElement('input', {
 					required: true,
 					type: 'text',
@@ -47,29 +58,46 @@ export default (accountData = {}) => createElement('section', {}, container => {
 					name: 'email',
 					value: accountData.email ?? ''
 				}, input => formFunctions.addInput(input)), "Email address"),
-				InputContainer(createElement('input', {
-					type: 'password',
-					name: 'password',
-					value: accountSecrets.password ?? ''
-				}, input => formFunctions.addInput(input)), "Password"),
+				InputContainer(passwordInput, "Password"),
 				createElement('div', {}, buttonContainer => {
 					buttonContainer.classList.add('account-editor-buttons');
 					formFunctions.addInput(buttonContainer.appendChild(createElement('input', {
 						type: 'submit',
-						value: 'Save'
+						value: "Save"
 					})));
 					if (accountData.id) formFunctions.addInput(buttonContainer.appendChild(createElement('button', {
 						type: 'button',
-						innerText: 'Delete',
+						innerText: "Delete",
 						onclick: () => {
 							formFunctions.disable();
 							deleteAccount(accountData.id).then(viewStack.pop);
 						}
 					}, deleteButton => deleteButton.classList.add('delete'))));
+					formFunctions.addInput(buttonContainer.appendChild(createElement('button', {
+						type: 'button',
+						innerText: "Generate Password",
+						onclick: () => {
+							formFunctions.disable();
+							passwordInput.value = generatePassword();
+							formFunctions.disable(false);
+						}
+					})));
+					formFunctions.addInput(buttonContainer.appendChild(createElement('button', {
+						type: 'button',
+						innerText: "Reveal Password",
+						onclick: event => {
+							if (passwordInput.type === 'password') {
+								passwordInput.type = 'text';
+								event.target.innerText = "Hide Password";
+							}
+							else {
+								passwordInput.type = 'password';
+								event.target.innerText = "Reveal Password";
+							}
+						}
+					})))
 				})
 			);
-			if (accountData.id) getData(accountData.id).then(populateForm);
-			else populateForm();
 		})
 	);
 });

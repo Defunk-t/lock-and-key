@@ -2,7 +2,7 @@ import {PrivateKey, PublicKey, readKey, decrypt, encrypt, decryptKey, readPrivat
 import EventHandler from '../event.js';
 
 import testPassword from './test-password.js';
-import generateID from './generate-id.js';
+import {generateID, generatePassword} from './generate-id.js';
 
 /**
  * @property {function(password:string):Promise<boolean>} testPassword
@@ -225,11 +225,13 @@ export const onAccountChange = (...fn) => {
 };
 
 export {
-	testPassword
+	testPassword,
+	generatePassword
 };
 
 export default {
 	testPassword,
+	generatePassword,
 	unlock,
 	getData,
 	writeData,
