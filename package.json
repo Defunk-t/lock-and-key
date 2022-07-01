@@ -18,11 +18,11 @@
     }
   },
   "devDependencies": {
-    "electron": "18.1.0",
-    "electron-builder": "23.0.3"
+    "electron": "19.0.7",
+    "electron-builder": "23.2.0"
   },
   "dependencies": {
     "argon2": "0.28.5",
-    "openpgp": "5.2.1"
+    "openpgp": "5.3.1"
   }
 }
